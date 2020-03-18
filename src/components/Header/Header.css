@@ -1,0 +1,27 @@
+.header {
+    overflow: hidden;
+    background-color: #f1f1f1;
+    padding: 20px 10px;
+}
+
+.logo {
+    margin-left: 2%;
+    float: left;
+    text-transform: uppercase;
+    font-size: 18px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.options {
+    text-transform: uppercase;
+    float: right;
+}
+
+.history, .signup {
+  color: black;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px; 
+}
