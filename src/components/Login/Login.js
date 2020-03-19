@@ -28,10 +28,7 @@ class Login extends Component {
             body: JSON.stringify({
                 username: this.state.username,
                 password: this.state.password
-            }),
-            headers: {
-                "Accept": "application/json",
-            }
+            })
         })
         .then(response => {
             if(response.status === 200) {
