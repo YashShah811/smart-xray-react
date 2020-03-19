@@ -1,1 +1,1 @@
-export const server = 'https://smart-xray-node-server.herokuapp.com/'
+export const server = 'https://smart-xray-node-server.herokuapp.com'
