@@ -10,7 +10,8 @@ class Login extends Component {
         super(props);
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            loading: false
         }
     }
 
@@ -22,6 +23,9 @@ class Login extends Component {
 
     onSubmit = () => {
         this.ckeckInput();
+        this.setState({
+            loading: true
+        })
         fetch(server + '/login', {
             method: "POST",
             mode: "cors",
@@ -37,11 +41,16 @@ class Login extends Component {
             if(response.status === 200) {
                 this.props.loginAction(true)
             }
+            localStorage.setItem('Login', this.props.login.login)
             return response.json();
         }).then(responseJson => {
             if(responseJson.data) {
                 this.props.userAction(responseJson.data.id)
             }
+            localStorage.setItem('UserId', responseJson.data.id)
+            this.setState({
+                loading: false
+            })
         })
         .catch( e => console.log(e) )
     }
@@ -61,10 +70,18 @@ class Login extends Component {
     }
 
     render() {
-        if(this.props.login.login) {
-            return <UploadImage />
+        if(this.state.loading) {
+            return (
+                <p>
+                    Loading...
+                </p>
+            )
         } else {
-            return this.login()
+            if(localStorage.getItem('Login')) {
+                return <UploadImage />
+            } else {
+                return this.login()
+            }
         }
     }
 }

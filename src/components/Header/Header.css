@@ -17,11 +17,11 @@
 .options {
     text-transform: uppercase;
     float: right;
-}
-
-.history, .signup {
-  color: black;
-  padding: 12px;
-  text-decoration: none;
-  font-size: 18px; 
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+    margin-right: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bolder;
 }

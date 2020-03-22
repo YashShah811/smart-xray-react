@@ -18,7 +18,7 @@ class History extends Component {
     }
 
     componentDidMount() {
-        fetch(server + '/history/'+this.props.userId.userId, {
+        fetch(server + '/history/'+localStorage.getItem('UserId'), {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -62,7 +62,7 @@ class History extends Component {
                                     </div>
                                     <div>
                                         <LineChart 
-                                            width={700} 
+                                            width={800} 
                                             height={400} 
                                             data={[
                                                 {name: 'Cardiomegaly', value: (d.cardiomegaly * 100).toFixed(2)},
@@ -72,7 +72,7 @@ class History extends Component {
                                                 {name: 'Pleural effusion', value: (d.pleural_effusion * 100).toFixed(2)}
                                             ]}
                                             margin={{
-                                                top:5, left:20, right:75
+                                                top:5, left:20, right:80
                                             }}>
                                                 <CartesianGrid strokeDasharray="3 3" />
                                                 <XAxis dataKey='name' />
