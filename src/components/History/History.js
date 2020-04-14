@@ -4,7 +4,7 @@ import './History.css';
 import UploadImage from '../UploadImage/UploadImage';
 import { connect } from 'react-redux';
 import { server } from '../../properties';
-import { LineChart, XAxis, YAxis, Line, Tooltip, Legend, CartesianGrid } from 'recharts';
+import { LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 class History extends Component {
 
@@ -41,7 +41,8 @@ class History extends Component {
                     {
                         this.state.data.map((d, i) => (
                             <div key={i} className="history-container">
-                                <div>{new Intl.DateTimeFormat("en-GB", {
+                                <div className="time">
+                                    {new Intl.DateTimeFormat("en-GB", {
                                       year: "numeric",
                                       month: "long",
                                       day: "2-digit",
@@ -53,14 +54,12 @@ class History extends Component {
                                     }).format(new Date(d.access_dts))}
                                 </div>
                                 <div className='history'>
-                                    <div className='imagePreview'>
-                                        <img 
-                                        src={'file:///D:/Python/xRay/Code/outs/images/'+d.image_path}
-                                        height='200'
-                                        width='200'
-                                        alt='' />
-                                    </div>
-                                    <div>
+                                    <img 
+                                    src={server+'/'+d.image_path.split('.')[0]+'_'+localStorage.getItem('UserId')+'.'+d.image_path.split('.')[1]}
+                                    height='400'
+                                    width='400'
+                                    alt='' />
+                                <div>
                                         <LineChart 
                                             width={800} 
                                             height={400} 
@@ -72,14 +71,13 @@ class History extends Component {
                                                 {name: 'Pleural effusion', value: (d.pleural_effusion * 100).toFixed(2)}
                                             ]}
                                             margin={{
-                                                top:5, left:20, right:80
+                                                top:5, left:20, right:100
                                             }}>
-                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <CartesianGrid />
                                                 <XAxis dataKey='name' />
                                                 <YAxis />
                                                 <Tooltip />
-                                                <Legend />
-                                                <Line type='linear' dataKey='value' activeDot={{ r:3 }} />
+                                                <Line dataKey='value'/>
                                         </LineChart>
                                     </div>
                                     <div className="flex-container">

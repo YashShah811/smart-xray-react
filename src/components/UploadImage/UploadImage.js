@@ -3,6 +3,7 @@ import './UploadImage.css';
 import History from '../History/History';
 import { connect } from 'react-redux';
 import { server } from '../../properties';
+import { LineChart, XAxis, YAxis, Line, Tooltip, Legend, CartesianGrid } from 'recharts';
 
 class UploadImage extends Component {
 
@@ -34,9 +35,15 @@ calculate = () => {
     this.setState({
         loading: true
     })
+    if(this.state.selectedFile === null) {
+        alert("Please select file.")
+        this.setState({
+            loading: false
+        })
+    }
     let data = new FormData();
     data.append('image', this.state.selectedFile)
-    fetch(server + "/calculate/"+this.props.userId.userId, {
+    fetch(server + "/calculate/"+localStorage.getItem('UserId'), {
         method: 'POST',
         mode: 'cors',
         body: data,
@@ -100,19 +107,40 @@ result = () => {
         return(
             <div>
                 <div className='response'>
-                    <div>
+                    <div className="image">
                         <img 
-                        src={'file:///D:/Python/xRay/Code/outs/images/'+d[1]}
-                        height='200'
-                        width='200'
+                        src={server+'/'+d[1].split('.')[0]+'_'+localStorage.getItem('UserId')+'.'+d[1].split('.')[1]}
+                        height='400'
+                        width='400'
                         alt='' />
                     </div>
+                    <div>
+                        <LineChart 
+                            width={800} 
+                            height={400}
+                            data={[
+                                {name: 'Cardiomegaly', value: (d[2] * 100).toFixed(2)},
+                                {name: 'Edema', value: (d[3] * 100).toFixed(2)},
+                                {name: 'Consolidation', value: (d[4] * 100).toFixed(2)},
+                                {name: 'Atelectasis', value: (d[5] * 100).toFixed(2)},
+                                {name: 'Pleural effusion', value: (d[6] * 100).toFixed(2)}
+                            ]}
+                            margin={{
+                                top:5, left:20, right:100
+                            }}>
+                                <CartesianGrid />
+                                <XAxis dataKey='name' />
+                                <YAxis />
+                                <Tooltip />
+                                <Line dataKey='value' />
+                        </LineChart>
+                    </div>
                     <div className='result'>
-                        <div> cardiomegaly <br/> {d[2]} </div>
-                        <div> edema <br /> {d[3]} </div>
-                        <div> consolidation <br /> {d[4]} </div>
-                        <div> atelectasis <br /> {d[5]} </div>
-                        <div> pleural effusion <br /> {d[6]} </div>
+                        <div> cardiomegaly <br/> {(d[2] * 100).toFixed(2)} </div>
+                        <div> edema <br /> {(d[3] * 100).toFixed(2)} </div>
+                        <div> consolidation <br /> {(d[4] * 100).toFixed(2)} </div>
+                        <div> atelectasis <br /> {(d[5] * 100).toFixed(2)} </div>
+                        <div> pleural effusion <br /> {(d[6] * 100).toFixed(2)} </div>
                     </div><br />
                 </div>
                 <button onClick={this.goHome}>

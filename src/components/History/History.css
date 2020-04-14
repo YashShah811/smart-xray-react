@@ -6,6 +6,7 @@
     border: 1px solid black;
     color: black;
     margin-top: 10%;
+    padding: 2%;
 }
 
 .history {
@@ -24,6 +25,6 @@
     /* padding: 10px; */
 }
 
-.imagePreview {
-    margin-top: 10px;
+.time {
+    margin-bottom: 1%;
 }

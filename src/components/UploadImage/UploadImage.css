@@ -18,18 +18,25 @@ input[type="file"] {
 
 .result {
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
 }
 
 .result > div {
-    margin: 10px;
-    padding: 10px;
+    margin: 5px;
 }
 
 .response {
+    display: flex;
     align-self: center;
     background-color: aliceblue;
     border: 1px solid black;
     color: black;
     margin-top: 10%;
+    padding: 2%;
+}
+
+.image {
+    display: flex;
+    align-self: center;
 }
