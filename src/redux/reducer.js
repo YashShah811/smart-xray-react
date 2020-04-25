@@ -1,4 +1,4 @@
-import { LOADING, LOGIN, USER_ID } from './action';
+import { LOADING, LOGIN, USER_ID, HISTORY } from './action';
 import { combineReducers } from 'redux';
 
 const initialState = {
@@ -42,8 +42,21 @@ const userIdReducer = (state = initialState, action) => {
     }
 }
 
+const historyReducer = (state = initialState, action) => {
+    switch(action.type) {
+        case HISTORY : 
+            return {
+                ...state,
+                history: action.payload
+            }
+        default : 
+            return state
+    }
+}
+
 export const rootReducer = combineReducers({
     login: loginReducer,
     loading: loadingReducer,
-    userId: userIdReducer
+    userId: userIdReducer,
+    history: historyReducer
 })

@@ -3,6 +3,16 @@ import { connect } from 'react-redux';
 import { login, userId } from '../../redux/action';
 import UploadImage from '../UploadImage/UploadImage';
 import { server } from '../../properties';
+import { Button, TextField, CircularProgress, Snackbar, Grid, withStyles, FormControl } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
+
+const styles = theme => ({
+    login: {
+        alignContent:'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
+})
 
 class Login extends Component {
 
@@ -11,21 +21,33 @@ class Login extends Component {
         this.state = {
             username: '',
             password: '',
-            loading: false
+            loading: false,
+            open: false,
+            alertMessage: ''
         }
     }
 
-    ckeckInput = () => {
+    alert = () => (
+        <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            open={this.state.open}
+            onClose={() => this.setState({ open: !this.state.open })}
+            autoHideDuration={3000}
+            message={this.state.alertMessage}
+        />
+    )
+
+    ckeckInput = (msg) => {
         if(this.state.username === '' || this.state.password === ''){
-            alert('Please check username or password.')
+            this.props.loginAction(false)
+            this.setState({ open: true, alertMessage: msg, loading: false })
         }
     }
-
     onSubmit = () => {
-        this.ckeckInput();
         this.setState({
             loading: true
         })
+        this.ckeckInput('username or password cannot be empty');
         fetch(server + '/login', {
             method: "POST",
             mode: "cors",
@@ -40,41 +62,69 @@ class Login extends Component {
         .then(response => {
             if(response.status === 200) {
                 this.props.loginAction(true)
+                localStorage.setItem('Login', this.props.login.login)
             }
-            localStorage.setItem('Login', this.props.login.login)
             return response.json();
         }).then(responseJson => {
-            if(responseJson.data) {
+            console.log(responseJson)
+            if(responseJson.data === null) {
+                this.setState({
+                    loading: false,
+                    open: true,
+                    alertMessage: responseJson.message
+                })
+            }else {
                 this.props.userAction(responseJson.data.id)
+                localStorage.setItem('UserId', responseJson.data.id)
+                localStorage.setItem('UserName', responseJson.data.username)
+                this.setState({
+                    loading: false
+                })
             }
-            localStorage.setItem('UserId', responseJson.data.id)
-            this.setState({
-                loading: false
-            })
         })
         .catch( e => console.log(e) )
     }
 
     login = () => {
-        return(
-            <div className="login">
-                <label>Username </label>
-                <input type="text" onChange={(i) => {this.setState({username: i.target.value})}} /><br />
-                <label>Password </label>
-                <input type="password" onChange={(i) => {this.setState({password: i.target.value})}}/><br /><br />
-                <button className="submitButton" onClick={this.onSubmit}>
-                    Submit
-                </button>
-            </div>
+        const { classes } = this.props;
+        return (
+            <Grid container item direction='column' justify='center' alignItems='center' style={{ minHeight: '80vh' }}>
+                    <TextField
+                        margin='normal'
+                        color='primary'
+                        onChange={(i) => {this.setState({username: i.target.value})}}
+                        label="Username"
+                        id="outlined-size-normal"
+                        variant="outlined"
+                        fullWidth={false}
+                    />
+                    <br/>
+                    <TextField
+                        color='primary'
+                        onChange={(i) => {this.setState({password: i.target.value})}}
+                        label="Password"
+                        id="outlined-size-normal"
+                        variant="outlined"
+                        fullWidth={false}
+                        type='password'
+                    />
+                    <br/>
+                    <Button onClick={this.onSubmit} color='primary'>
+                        Login
+                    </Button>
+                    {this.alert()}
+            </Grid>
         )
     }
 
     render() {
         if(this.state.loading) {
             return (
-                <p>
-                    Loading...
-                </p>
+                <Grid container item justify='center' alignItems='center' style={{ minHeight: '80vh' }}>
+                    <CircularProgress
+                        disableShrink
+                    />
+                </Grid>
             )
         } else {
             if(localStorage.getItem('Login')) {
@@ -95,4 +145,4 @@ const mapDispatchToProps = dispatch => ({
     userAction: id => {dispatch(userId(id))}
 })
 
-export default connect(mapStateToProps, mapDispatchToProps) (Login);
+export default connect(mapStateToProps, mapDispatchToProps) (withStyles(styles)(Login));

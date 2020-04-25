@@ -1,6 +1,7 @@
 .history-container {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     align-self: center;
     background-color: aliceblue;
     border: 1px solid black;
