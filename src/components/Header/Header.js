@@ -34,14 +34,14 @@ class Header extends Component {
             <div>
             <AppBar position="fixed">
                 <Toolbar>
-                    <IconButton edge="start" color="inherit" aria-label="menu">
+                    {/*<IconButton edge="start" color="inherit" aria-label="menu">
                         <MenuIcon onClick={() => this.toggleDrawer(true)}/>
                         <Drawer anchor='left' open={this.state.open} onClose={() => this.toggleDrawer(false)}>
                             <div className={classes.drawer}>
                                 History
                             </div>
                         </Drawer>
-                    </IconButton>
+                    </IconButton>*/}
                     <Typography variant="h6" style={{ flexGrow: 1 }}>
                         Smart X-Ray
                     </Typography>
