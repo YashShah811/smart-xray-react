@@ -137,8 +137,8 @@ class History extends Component {
                                         Update feedback
                                     </Button>
                                 </Grid>
-                                <Grid container item xs={8}>
-                                    <Table style={{ border: '1px solid black' }}>
+                                <Grid container item xs={8} >
+                                    <Table style={{ border: '2px solid black' }}>
                                         <TableBody>
                                             <TableRow>
                                                 <TableCell>Cardiomegaly</TableCell>
