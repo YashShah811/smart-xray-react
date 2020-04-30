@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { login, userId } from '../../redux/action';
+import { login, userId, userName } from '../../redux/action';
 import UploadImage from '../UploadImage/UploadImage';
 import { server } from '../../properties';
-import { Button, TextField, CircularProgress, Snackbar, Grid, withStyles, FormControl } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { Button, TextField, CircularProgress, Snackbar, Grid, withStyles } from '@material-ui/core';
 
 const styles = theme => ({
     login: {
@@ -62,11 +61,12 @@ class Login extends Component {
         .then(response => {
             if(response.status === 200) {
                 this.props.loginAction(true)
-                localStorage.setItem('Login', this.props.login.login)
+                sessionStorage.setItem('Login', this.props.login.login)
             }
-            return response.json();
+            console.log('Response : ', response)
+            return response.json()
         }).then(responseJson => {
-            console.log(responseJson)
+            console.log('ResponseJson : ', responseJson)
             if(responseJson.data === null) {
                 this.setState({
                     loading: false,
@@ -75,8 +75,9 @@ class Login extends Component {
                 })
             }else {
                 this.props.userAction(responseJson.data.id)
-                localStorage.setItem('UserId', responseJson.data.id)
-                localStorage.setItem('UserName', responseJson.data.username)
+                this.props.userNameAction(responseJson.data.username)
+                sessionStorage.setItem('UserId', responseJson.data.id)
+                sessionStorage.setItem('UserName', responseJson.data.username)
                 this.setState({
                     loading: false
                 })
@@ -86,7 +87,6 @@ class Login extends Component {
     }
 
     login = () => {
-        const { classes } = this.props;
         return (
             <Grid container item direction='column' justify='center' alignItems='center' style={{ minHeight: '80vh' }}>
                     <TextField
@@ -127,7 +127,7 @@ class Login extends Component {
                 </Grid>
             )
         } else {
-            if(localStorage.getItem('Login')) {
+            if(sessionStorage.getItem('Login')) {
                 return <UploadImage />
             } else {
                 return this.login()
@@ -142,7 +142,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     loginAction: status => {dispatch(login(status))},
-    userAction: id => {dispatch(userId(id))}
+    userAction: id => {dispatch(userId(id))},
+    userNameAction: name => {dispatch(userName(name))},
 })
 
 export default connect(mapStateToProps, mapDispatchToProps) (withStyles(styles)(Login));

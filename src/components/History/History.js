@@ -5,11 +5,9 @@ import UploadImage from '../UploadImage/UploadImage';
 import {connect} from 'react-redux';
 import {history} from '../../redux/action';
 import {server} from '../../properties';
-import {LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, ResponsiveContainer} from 'recharts';
+import {BarChart, XAxis, YAxis, Bar, Tooltip, CartesianGrid, Legend, LabelList} from 'recharts';
 import {
     Grid,
-    Paper,
-    TableContainer,
     TableBody,
     TableRow,
     TableCell,
@@ -22,7 +20,6 @@ import {
     Table,
     CircularProgress, Snackbar
 } from '@material-ui/core';
-import Header from '../Header/Header';
 
 const styles = theme => ({
     offset: theme.mixins.toolbar,
@@ -64,7 +61,7 @@ class History extends Component {
 
     componentDidMount() {
         this.setState({ loading: true })
-        fetch(server + '/history/' + localStorage.getItem('UserId'), {
+        fetch(server + '/history/' + sessionStorage.getItem('UserId'), {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -112,26 +109,28 @@ class History extends Component {
                                     />
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <LineChart
+                                    <BarChart
                                         style={{ fontSize: 'calc(5px + 2vmin)'}}
                                         width={1000}
                                         height={400}
-                                        margin={{
-                                            right: 70
-                                        }}
-                                        data={[
-                                            {name: 'Cardiomegaly', value: (d.cardiomegaly * 100).toFixed(2)},
-                                            {name: 'Edema', value: (d.edema * 100).toFixed(2)},
-                                            {name: 'Consolidation', value: (d.consolidation * 100).toFixed(2)},
-                                            {name: 'Atelectasis', value: (d.atelectasis * 100).toFixed(2)},
-                                            {name: 'Pleural effusion', value: (d.pleural_effusion * 100).toFixed(2)}
-                                        ]}>
-                                        <XAxis dataKey='name'/>
-                                        <YAxis/>
-                                        <CartesianGrid/>
-                                        <Tooltip/>
-                                        <Line dataKey='value'/>
-                                    </LineChart>
+                                        data={[{
+                                            'Cardiomegaly': (d.cardiomegaly * 100).toFixed(2),
+                                            'Edema': (d.edema * 100).toFixed(2),
+                                            'Consolidation': (d.consolidation * 100).toFixed(2),
+                                            'Atelectasis': (d.atelectasis * 100).toFixed(2),
+                                            'Pleural effusion': (d.pleural_effusion * 100).toFixed(2),
+                                        }]}>
+                                        <XAxis />
+                                        <YAxis />
+                                        <Legend align='right' layout='vertical' verticalAlign='middle' margin={{
+                                            left: 50
+                                        }} />
+                                        <Bar barSize={100} dataKey='Cardiomegaly' fill="#8884d8" />
+                                        <Bar barSize={100} dataKey='Edema' fill="#82ca9d" />
+                                        <Bar barSize={100} dataKey='Consolidation' fill="#8884d8" />
+                                        <Bar barSize={100} dataKey='Atelectasis' fill="#82ca9d" />
+                                        <Bar barSize={100} dataKey='Pleural effusion' fill="#8884d8" />
+                                    </BarChart>
                                 </Grid>
                                 <Grid container item xs={4} alignContent='center' alignItems='center' justify='center'>
                                     <Button onClick={() => this.updateFeedbackHandler(i, d.userFeedback.id)}>
@@ -139,7 +138,7 @@ class History extends Component {
                                     </Button>
                                 </Grid>
                                 <Grid container item xs={8}>
-                                    <Table>
+                                    <Table style={{ border: '1px solid black' }}>
                                         <TableBody>
                                             <TableRow>
                                                 <TableCell>Cardiomegaly</TableCell>

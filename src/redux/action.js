@@ -1,5 +1,5 @@
 export const LOGIN = 'LOGIN'
-export const LOADING = 'LOADING'
+export const USER_NAME = 'USER_NAME'
 export const USER_ID = 'USER_ID'
 export const HISTORY = 'HISTORY'
 
@@ -10,10 +10,10 @@ export const login = (status) => {
     }
 }
 
-export const loading = (status) => {
+export const userName = (userName) => {
     return{
-        type: LOADING,
-        payload: status
+        type: USER_NAME,
+        payload: userName
     }
 }
 

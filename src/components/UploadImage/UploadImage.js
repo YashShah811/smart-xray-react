@@ -3,7 +3,7 @@ import './UploadImage.css';
 import History from '../History/History';
 import {connect} from 'react-redux';
 import {server} from '../../properties';
-import {LineChart, XAxis, YAxis, Line, Tooltip, Legend, CartesianGrid} from 'recharts';
+import {LineChart, XAxis, YAxis, Line, Tooltip, Legend, CartesianGrid, Bar, BarChart} from 'recharts';
 import {
     Button,
     CircularProgress,
@@ -40,6 +40,7 @@ class UploadImage extends Component {
             invalidFile: null,
             open: false,
             alertMessage: '',
+            isFeedbackSet: false,
             feedback: {
                 cardiomegaly: null,
                 edema: null,
@@ -60,6 +61,7 @@ class UploadImage extends Component {
         if (extension === 'jpg' || extension === 'png') {
             reader.onloadend = () => {
                 this.setState({
+                    invalidFile: false,
                     selectedFile: file,
                     preview: reader.result
                 })
@@ -88,7 +90,7 @@ class UploadImage extends Component {
         } else {
             let data = new FormData();
             data.append('image', this.state.selectedFile)
-            fetch(server + "/calculate/" + localStorage.getItem('UserId'), {
+            fetch(server + "/calculate/" + sessionStorage.getItem('UserId'), {
                 method: 'POST',
                 mode: 'cors',
                 body: data,
@@ -97,6 +99,7 @@ class UploadImage extends Component {
                 }
             }).then(response => response.json())
                 .then(responseJson => {
+                    console.log('Response: ', responseJson)
                     if (responseJson.data === null) {
                         this.setState({
                             loading: false,
@@ -137,13 +140,21 @@ class UploadImage extends Component {
                         onClick={this.calculate}>
                         Upload
                     </Button>
-                    <Button type='cancel' onClick={this.goHome}>
+                    <Button type='reset' onClick={this.goHome}>
                         Cancel
                     </Button>
                 </Grid>
                 {this.alert()}
             </Grid>
         )
+    }
+
+    goHome = () => {
+        this.setState({
+            selectedFile: null,
+            preview: null,
+            limit: null
+        })
     }
 
     alert = () => (
@@ -164,40 +175,51 @@ class UploadImage extends Component {
                     <Grid xs={4}>
                         <img
                             style={{ display: 'block', marginRight: 'auto', marginLeft: 'auto' }}
-                            src={server + '/' + d[1].split('.')[0] + '_' + localStorage.getItem('UserId') + '.' + d[1].split('.')[1]}
+                            src={server + '/' + d[1].split('.')[0] + '_' + sessionStorage.getItem('UserId') + '.' + d[1].split('.')[1]}
                             height='400'
                             width='400'
                             alt=''/>
                     </Grid>
                     <Grid xs={8}>
-                        <LineChart
+                        <BarChart
                             style={{ fontSize: 'calc(5px + 2vmin)'}}
                             width={1000}
                             height={400}
-                            data={[
-                                {name: 'Cardiomegaly', value: (d[2] * 100).toFixed(2)},
-                                {name: 'Edema', value: (d[3] * 100).toFixed(2)},
-                                {name: 'Consolidation', value: (d[4] * 100).toFixed(2)},
-                                {name: 'Atelectasis', value: (d[5] * 100).toFixed(2)},
-                                {name: 'Pleural effusion', value: (d[6] * 100).toFixed(2)}
-                            ]}
-                            margin={{
-                                right: 70
-                            }}>
-                            <CartesianGrid/>
-                            <XAxis dataKey='name'/>
-                            <YAxis/>
-                            <Tooltip/>
-                            <Line dataKey='value'/>
-                        </LineChart>
+                            data={[{
+                                'Cardiomegaly': (d[2] * 100).toFixed(2),
+                                'Edema': (d[3] * 100).toFixed(2),
+                                'Consolidation': (d[4] * 100).toFixed(2),
+                                'Atelectasis': (d[5] * 100).toFixed(2),
+                                'Pleural effusion': (d[6] * 100).toFixed(2),
+                            }]}>
+                            <XAxis />
+                            <YAxis />
+                            <Legend align='right' layout='vertical' verticalAlign='middle' margin={{
+                                left: 50
+                            }} />
+                            <Bar barSize={100} dataKey='Cardiomegaly' fill="#8884d8" />
+                            <Bar barSize={100} dataKey='Edema' fill="#82ca9d" />
+                            <Bar barSize={100} dataKey='Consolidation' fill="#8884d8" />
+                            <Bar barSize={100} dataKey='Atelectasis' fill="#82ca9d" />
+                            <Bar barSize={100} dataKey='Pleural effusion' fill="#8884d8" />
+
+                        </BarChart>
                     </Grid>
                     <Grid container item xs={4} alignContent='center' alignItems='center' justify='center'>
-                        <Button onClick={this.submitFeedback}>
+                        <Button
+                            onClick={this.submitFeedback}
+                            disabled={
+                                    this.state.feedback.cardiomegaly === null ||
+                                    this.state.feedback.edema === null ||
+                                    this.state.feedback.consolidation === null ||
+                                    this.state.feedback.atelectasis === null ||
+                                    this.state.feedback.pleural_effusion === null
+                            }>
                             Submit feedback
                         </Button>
                     </Grid>
                     <Grid container item xs={8}>
-                        <Table>
+                        <Table style={{ border: '1px solid black' }}>
                             <TableBody>
                                 <TableRow>
                                     <TableCell>Cardiomegaly</TableCell>
@@ -274,17 +296,17 @@ class UploadImage extends Component {
         this.setState({
             loading: true
         })
-        fetch(server + '/feedback/' + this.state.responseData.userAccessDetailsId, {
-            method: 'POST',
+        fetch(server + '/feedback/' + this.state.responseData.feedbackResponseId, {
+            method: 'PUT',
             mode: 'cors',
             body: JSON.stringify({
-                feedbackBody: this.state.feedback
+                feedback: this.state.feedback
             }),
             headers: {
                 'Content-Type': 'application/json'
             }
         }).then(response =>{
-            if(response.status === 201) {
+            if(response.status === 200) {
                 this.setState({
                     loading: false,
                     feedbackSubmitted: true,

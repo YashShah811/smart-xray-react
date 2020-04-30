@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {login, history} from '../../redux/action';
-import {AppBar, Toolbar, IconButton, Typography, Button, Drawer} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu'
-import History from '../History/History';
+import {AppBar, Toolbar, Typography, Button } from '@material-ui/core';
 import {withStyles} from "@material-ui/core/styles";
 
 const styles = theme => ({
@@ -18,47 +16,38 @@ class Header extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            open: false
+            open: false,
         }
     }
 
-    toggleDrawer = (status) => {
-        this.setState({
-            open: status
-        })
-    }
+    // toggleDrawer = (status) => {
+    //     this.setState({
+    //         open: status
+    //     })
+    // }
 
     header = () => {
-        const { classes } = this.props;
         return (
             <div>
             <AppBar position="fixed">
                 <Toolbar>
-                    {/*<IconButton edge="start" color="inherit" aria-label="menu">
-                        <MenuIcon onClick={() => this.toggleDrawer(true)}/>
-                        <Drawer anchor='left' open={this.state.open} onClose={() => this.toggleDrawer(false)}>
-                            <div className={classes.drawer}>
-                                History
-                            </div>
-                        </Drawer>
-                    </IconButton>*/}
                     <Typography variant="h6" style={{ flexGrow: 1 }}>
                         Smart X-Ray
                     </Typography>
                     <Typography variant="h6" style={{ flexGrow: 1 }}>
                         {
-                            this.props.login.login || localStorage.getItem('Login')
-                                ? localStorage.getItem('UserName') === null
-                                    ? window.location.reload(true)
-                                    : 'Hi, '+localStorage.getItem('UserName')
+                            this.props.login.login || sessionStorage.getItem('Login')
+                                ? sessionStorage.getItem('UserName') === null
+                                    ? 'Hi, '+this.props.userName.userName
+                                : 'Hi, '+sessionStorage.getItem('UserName')
                                 : ''
                         }
                     </Typography>
                     <Button color="inherit" onClick={() => this.props.historyAction(true)}>
-                        {this.props.login.login || localStorage.getItem('Login') ? 'History' : ''}
+                        {this.props.login.login || sessionStorage.getItem('Login') ? 'History' : ''}
                     </Button>
                     <Button color="inherit" onClick={this.logout}>
-                        {this.props.login.login || localStorage.getItem('Login') ? 'SIGNOUT' : ''}
+                        {this.props.login.login || sessionStorage.getItem('Login') ? 'SIGNOUT' : ''}
                     </Button>
                 </Toolbar>
             </AppBar>
@@ -68,7 +57,7 @@ class Header extends Component {
     }
 
     logout = () => {
-        localStorage.clear();
+        sessionStorage.clear();
         this.props.loginAction(false);
         this.props.historyAction(false);
     }
@@ -80,7 +69,8 @@ class Header extends Component {
 
 const mapStateToProps = state => ({
     login: state.login,
-    history: state.history
+    history: state.history,
+    userName: state.userName,
 })
 
 const mapDispatchToProps = dispatch => ({
