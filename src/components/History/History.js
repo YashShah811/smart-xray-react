@@ -18,7 +18,7 @@ import {
     Radio,
     RadioGroup,
     Table,
-    CircularProgress, Snackbar
+    CircularProgress, Snackbar, FormControl
 } from '@material-ui/core';
 
 const styles = theme => ({
@@ -120,16 +120,16 @@ class History extends Component {
                                             'Atelectasis': (d.atelectasis * 100).toFixed(2),
                                             'Pleural effusion': (d.pleural_effusion * 100).toFixed(2),
                                         }]}>
-                                        <XAxis />
+                                        <XAxis tick={false}/>
                                         <YAxis />
                                         <Legend align='right' layout='vertical' verticalAlign='middle' margin={{
                                             left: 50
                                         }} />
-                                        <Bar barSize={100} dataKey='Cardiomegaly' fill="#8884d8" />
-                                        <Bar barSize={100} dataKey='Edema' fill="#82ca9d" />
-                                        <Bar barSize={100} dataKey='Consolidation' fill="#8884d8" />
-                                        <Bar barSize={100} dataKey='Atelectasis' fill="#82ca9d" />
-                                        <Bar barSize={100} dataKey='Pleural effusion' fill="#8884d8" />
+                                        <Bar barSize={100} dataKey='Cardiomegaly' fill="#5BC0EB" />
+                                        <Bar barSize={100} dataKey='Edema' fill="#FDE74C" />
+                                        <Bar barSize={100} dataKey='Consolidation' fill="#9BC53D" />
+                                        <Bar barSize={100} dataKey='Atelectasis' fill="#E55934" />
+                                        <Bar barSize={100} dataKey='Pleural effusion' fill="#FA7921" />
                                     </BarChart>
                                 </Grid>
                                 <Grid container item xs={4} alignContent='center' alignItems='center' justify='center'>
@@ -138,52 +138,62 @@ class History extends Component {
                                     </Button>
                                 </Grid>
                                 <Grid container item xs={8} >
-                                    <Table style={{ border: '2px solid black' }}>
+                                    <Table style={{ border: '2px solid black', marginRight: '2%', marginBottom: '2%' }}>
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell>Cardiomegaly</TableCell>
-                                                <TableCell>Edema</TableCell>
-                                                <TableCell>Consolidation</TableCell>
-                                                <TableCell>Atelectasis</TableCell>
-                                                <TableCell>Pleural effusion</TableCell>
+                                                <TableCell align='center'>Cardiomegaly</TableCell>
+                                                <TableCell align='center'>Edema</TableCell>
+                                                <TableCell align='center'>Consolidation</TableCell>
+                                                <TableCell align='center'>Atelectasis</TableCell>
+                                                <TableCell align='center'>Pleural effusion</TableCell>
                                             </TableRow>
                                             <TableRow>
-                                                <TableCell>{(d.cardiomegaly * 100).toFixed(2) + '%'}</TableCell>
-                                                <TableCell>{(d.edema * 100).toFixed(2) + '%'}</TableCell>
-                                                <TableCell>{(d.consolidation * 100).toFixed(2) + '%'}</TableCell>
-                                                <TableCell>{(d.atelectasis * 100).toFixed(2) + '%'}</TableCell>
-                                                <TableCell>{(d.pleural_effusion * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d.cardiomegaly * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d.edema * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d.consolidation * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d.atelectasis * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d.pleural_effusion * 100).toFixed(2) + '%'}</TableCell>
                                             </TableRow>
                                             <TableRow>
-                                                <TableCell>
-                                                    <RadioGroup name='cardiomegaly' value={d.userFeedback.cardiomegaly} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                        <FormControlLabel control={<Radio/>} label='Yes' value='Yes'/>
-                                                        <FormControlLabel control={<Radio/>} label='No' value='No'/>
-                                                    </RadioGroup>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='cardiomegaly' value={d.userFeedback.cardiomegaly} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes'/>
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No'/>
+                                                        </RadioGroup>
+                                                    </FormControl>
                                                 </TableCell>
-                                                <TableCell>
-                                                    <RadioGroup name='edema' value={d.userFeedback.edema} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                        <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                        <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                                    </RadioGroup>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='edema' value={d.userFeedback.edema} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        </RadioGroup>
+                                                    </FormControl>
                                                 </TableCell>
-                                                <TableCell>
-                                                    <RadioGroup name='consolidation' value={d.userFeedback.consolidation} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                        <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                        <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                                    </RadioGroup>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='consolidation' value={d.userFeedback.consolidation} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        </RadioGroup>
+                                                    </FormControl>
                                                 </TableCell>
-                                                <TableCell>
-                                                    <RadioGroup name='atelectasis' value={d.userFeedback.atelectasis} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                        <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                        <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                                    </RadioGroup>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='atelectasis' value={d.userFeedback.atelectasis} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        </RadioGroup>
+                                                    </FormControl>
                                                 </TableCell>
-                                                <TableCell>
-                                                    <RadioGroup name='pleural_effusion' value={d.userFeedback.pleural_effusion} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                        <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                        <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                                    </RadioGroup>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='pleural_effusion' value={d.userFeedback.pleural_effusion} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        </RadioGroup>
+                                                    </FormControl>
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -192,9 +202,6 @@ class History extends Component {
                             </Grid>
                         )
                     })}
-                <Button onClick={this.home} variant="contained" style={{ marginTop: '1%' }}>
-                    Home
-                </Button>
                 {this.alert()}
             </Grid>
         )
@@ -205,7 +212,7 @@ class History extends Component {
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
             open={this.state.open}
             onClose={() => this.setState({ open: !this.state.open })}
-            autoHideDuration={3000}
+            autoHideDuration={2000}
             message={this.state.message}
         />
     )

@@ -3,7 +3,7 @@ import './UploadImage.css';
 import History from '../History/History';
 import {connect} from 'react-redux';
 import {server} from '../../properties';
-import {LineChart, XAxis, YAxis, Line, Tooltip, Legend, CartesianGrid, Bar, BarChart} from 'recharts';
+import { XAxis, YAxis, Legend, Bar, BarChart} from 'recharts';
 import {
     Button,
     CircularProgress,
@@ -13,7 +13,7 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    RadioGroup, FormControlLabel, Radio, Table
+    RadioGroup, FormControlLabel, Radio, Table, FormControl
 } from '@material-ui/core';
 import {withStyles} from "@material-ui/core/styles";
 
@@ -162,7 +162,7 @@ class UploadImage extends Component {
             anchorOrigin={{vertical: "top", horizontal: "center"}}
             open={this.state.open}
             onClose={() => this.setState({open: !this.state.open})}
-            autoHideDuration={3000}
+            autoHideDuration={2000}
             message={this.state.alertMessage}
         />
     )
@@ -192,16 +192,16 @@ class UploadImage extends Component {
                                 'Atelectasis': (d[5] * 100).toFixed(2),
                                 'Pleural effusion': (d[6] * 100).toFixed(2),
                             }]}>
-                            <XAxis />
+                            <XAxis tick={false}/>
                             <YAxis />
                             <Legend align='right' layout='vertical' verticalAlign='middle' margin={{
                                 left: 50
                             }} />
-                            <Bar barSize={100} dataKey='Cardiomegaly' fill="#8884d8" />
-                            <Bar barSize={100} dataKey='Edema' fill="#82ca9d" />
-                            <Bar barSize={100} dataKey='Consolidation' fill="#8884d8" />
-                            <Bar barSize={100} dataKey='Atelectasis' fill="#82ca9d" />
-                            <Bar barSize={100} dataKey='Pleural effusion' fill="#8884d8" />
+                            <Bar barSize={100} dataKey='Cardiomegaly' fill="#5BC0EB" />
+                            <Bar barSize={100} dataKey='Edema' fill="#FDE74C" />
+                            <Bar barSize={100} dataKey='Consolidation' fill="#9BC53D" />
+                            <Bar barSize={100} dataKey='Atelectasis' fill="#E55934" />
+                            <Bar barSize={100} dataKey='Pleural effusion' fill="#FA7921" />
 
                         </BarChart>
                     </Grid>
@@ -219,52 +219,62 @@ class UploadImage extends Component {
                         </Button>
                     </Grid>
                     <Grid container item xs={8}>
-                        <Table style={{ border: '1px solid black' }}>
+                        <Table style={{ border: '2px solid black', marginRight: '2%', marginBottom: '2%' }}>
                             <TableBody>
                                 <TableRow>
-                                    <TableCell>Cardiomegaly</TableCell>
-                                    <TableCell>Edema</TableCell>
-                                    <TableCell>Consolidation</TableCell>
-                                    <TableCell>Atelectasis</TableCell>
-                                    <TableCell>Pleural effusion</TableCell>
+                                    <TableCell align='center'>Cardiomegaly</TableCell>
+                                    <TableCell align='center'>Edema</TableCell>
+                                    <TableCell align='center'>Consolidation</TableCell>
+                                    <TableCell align='center'>Atelectasis</TableCell>
+                                    <TableCell align='center'>Pleural effusion</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell>{(d[2] * 100).toFixed(2) + '%'}</TableCell>
-                                    <TableCell>{(d[3] * 100).toFixed(2) + '%'}</TableCell>
-                                    <TableCell>{(d[4] * 100).toFixed(2) + '%'}</TableCell>
-                                    <TableCell>{(d[5] * 100).toFixed(2) + '%'}</TableCell>
-                                    <TableCell>{(d[6] * 100).toFixed(2) + '%'}</TableCell>
+                                    <TableCell align='center'>{(d[2] * 100).toFixed(2) + '%'}</TableCell>
+                                    <TableCell align='center'>{(d[3] * 100).toFixed(2) + '%'}</TableCell>
+                                    <TableCell align='center'>{(d[4] * 100).toFixed(2) + '%'}</TableCell>
+                                    <TableCell align='center'>{(d[5] * 100).toFixed(2) + '%'}</TableCell>
+                                    <TableCell align='center'>{(d[6] * 100).toFixed(2) + '%'}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell>
-                                        <RadioGroup name='cardiomegaly' onChange={e => this.feedbackChangeHandler(e)}>
-                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes'/>
-                                            <FormControlLabel control={<Radio/>} label='No' value='No'/>
-                                        </RadioGroup>
+                                    <TableCell align='center'>
+                                        <FormControl>
+                                            <RadioGroup name='cardiomegaly' onChange={e => this.feedbackChangeHandler(e)}>
+                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes'/>
+                                                <FormControlLabel control={<Radio/>} label='No' value='No'/>
+                                            </RadioGroup>
+                                        </FormControl>
                                     </TableCell>
-                                    <TableCell>
-                                        <RadioGroup name='edema' onChange={e => this.feedbackChangeHandler(e)}>
-                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                        </RadioGroup>
+                                    <TableCell align='center'>
+                                        <FormControl>
+                                            <RadioGroup name='edema' onChange={e => this.feedbackChangeHandler(e)}>
+                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                            </RadioGroup>
+                                        </FormControl>
                                     </TableCell>
-                                    <TableCell>
-                                        <RadioGroup name='consolidation' onChange={e => this.feedbackChangeHandler(e)}>
-                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                        </RadioGroup>
+                                    <TableCell align='center'>
+                                        <FormControl>
+                                            <RadioGroup name='consolidation' onChange={e => this.feedbackChangeHandler(e)}>
+                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                            </RadioGroup>
+                                        </FormControl>
                                     </TableCell>
-                                    <TableCell>
-                                        <RadioGroup name='atelectasis' onChange={e => this.feedbackChangeHandler(e)}>
-                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                        </RadioGroup>
+                                    <TableCell align='center'>
+                                        <FormControl>
+                                            <RadioGroup name='atelectasis' onChange={e => this.feedbackChangeHandler(e)}>
+                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                            </RadioGroup>
+                                        </FormControl>
                                     </TableCell>
-                                    <TableCell>
-                                        <RadioGroup name='pleural_effusion' onChange={e => this.feedbackChangeHandler(e)}>
-                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                        </RadioGroup>
+                                    <TableCell align='center'>
+                                        <FormControl>
+                                            <RadioGroup name='pleural_effusion' onChange={e => this.feedbackChangeHandler(e)}>
+                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                            </RadioGroup>
+                                        </FormControl>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

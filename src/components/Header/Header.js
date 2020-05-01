@@ -43,6 +43,9 @@ class Header extends Component {
                                 : ''
                         }
                     </Typography>
+                    <Button color="inherit" onClick={() => this.props.historyAction(false)} disabled={!this.props.history.history}>
+                        {this.props.login.login || sessionStorage.getItem('Login') ? 'Upload' : ''}
+                    </Button>
                     <Button color="inherit" onClick={() => this.props.historyAction(true)}>
                         {this.props.login.login || sessionStorage.getItem('Login') ? 'History' : ''}
                     </Button>
