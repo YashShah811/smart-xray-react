@@ -55,24 +55,30 @@ class UploadImage extends Component {
     onChangeHandler = event => {
         var reader = new FileReader();
         const file = event.target.files[0];
-        const fileName = event.target.files[0].name;
-        const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-        console.log(extension)
-        if (extension === 'jpg' || extension === 'png') {
-            reader.onloadend = () => {
+        this.setState({
+            selectedFile: null,
+            preview: null
+        })
+        if(file) {
+            const fileName = event.target.files[0].name;
+            const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+            console.log(extension)
+            if (extension === 'jpg' || extension === 'png') {
+                reader.onloadend = () => {
+                    this.setState({
+                        invalidFile: false,
+                        selectedFile: file,
+                        preview: reader.result
+                    })
+                }
+                reader.readAsDataURL(file)
+            } else {
                 this.setState({
-                    invalidFile: false,
-                    selectedFile: file,
-                    preview: reader.result
+                    invalidFile: true,
+                    open: true,
+                    alertMessage: 'Invalid file.'
                 })
             }
-            reader.readAsDataURL(file)
-        } else {
-            this.setState({
-                invalidFile: true,
-                open: true,
-                alertMessage: 'Invalid file.'
-            })
         }
     }
 
