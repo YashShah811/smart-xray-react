@@ -5,7 +5,7 @@ import UploadImage from '../UploadImage/UploadImage';
 import {connect} from 'react-redux';
 import {history} from '../../redux/action';
 import {server} from '../../properties';
-import {BarChart, XAxis, YAxis, Bar, Tooltip, CartesianGrid, Legend, LabelList} from 'recharts';
+import {BarChart, XAxis, YAxis, Bar, Tooltip, CartesianGrid, Legend, LabelList, Line, ComposedChart, Cell} from 'recharts';
 import {
     Grid,
     TableBody,
@@ -38,7 +38,7 @@ const styles = theme => ({
         maxHeight: '400',
     },
     item: {
-        alignContent:'center',
+        alignContent: 'center',
         alignItems: 'center',
         justifyContent: 'center',
     }
@@ -60,7 +60,7 @@ class History extends Component {
 
 
     componentDidMount() {
-        this.setState({ loading: true })
+        this.setState({loading: true})
         fetch(server + '/history/' + sessionStorage.getItem('UserId'), {
             method: 'GET',
             mode: 'cors',
@@ -83,8 +83,32 @@ class History extends Component {
             <Grid container justify='center'>
                 {
                     this.state.data.map((d, i) => {
+                        const data = [
+                            {
+                                'name': 'Cardiomegaly',
+                                'value': (d.cardiomegaly * 100).toFixed(2),
+                                'threshold': 46.52,
+                            }, {
+                                'name': 'Edema',
+                                'value': (d.edema * 100).toFixed(2),
+                                'threshold': 71.05,
+                            }, {
+                            'name': 'Consolidation',
+                                'value': (d.consolidation * 100).toFixed(2),
+                                'threshold': 65.9,
+                            }, {
+                            'name': 'Atelectasis',
+                                'value': (d.atelectasis * 100).toFixed(2),
+                                'threshold': 54.93,
+                            }, {
+                            'name': 'Pleural Effusion',
+                                'value': (d.pleural_effusion * 100).toFixed(2),
+                                'threshold': 34.61,
+                            }
+                        ]
+                        const colors = ['#5BC0EB','#FDE74C','#9BC53D','#E55934','#FA7921']
                         return (
-                            <Grid container item xs={12} style={{ background: 'aliceblue', marginTop: '1%' }}>
+                            <Grid container item xs={12} style={{background: 'aliceblue', marginTop: '1%'}}>
                                 <Grid item xs={12}>
                                     <Typography variant='h5' color='primary' align='center'>
                                         {new Intl.DateTimeFormat("en-GB", {
@@ -101,7 +125,7 @@ class History extends Component {
                                 </Grid>
                                 <Grid item xs={4}>
                                     <img
-                                        style={{ display: 'block', marginRight: 'auto', marginLeft: 'auto' }}
+                                        style={{display: 'block', marginRight: 'auto', marginLeft: 'auto'}}
                                         src={server + '/' + d.image_path.split('.')[0] + '_' + localStorage.getItem('UserId') + '.' + d.image_path.split('.')[1]}
                                         alt=''
                                         width={400}
@@ -109,36 +133,41 @@ class History extends Component {
                                     />
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <BarChart
-                                        style={{ fontSize: 'calc(5px + 2vmin)'}}
+                                    <ComposedChart
+                                        style={{fontSize: 'calc(5px + 2vmin)'}}
                                         width={1000}
                                         height={400}
-                                        data={[{
-                                            'Cardiomegaly': (d.cardiomegaly * 100).toFixed(2),
-                                            'Edema': (d.edema * 100).toFixed(2),
-                                            'Consolidation': (d.consolidation * 100).toFixed(2),
-                                            'Atelectasis': (d.atelectasis * 100).toFixed(2),
-                                            'Pleural effusion': (d.pleural_effusion * 100).toFixed(2),
-                                        }]}>
+                                        data={data}>
                                         <XAxis tick={false}/>
-                                        <YAxis />
-                                        <Legend align='right' layout='vertical' verticalAlign='middle' margin={{
-                                            left: 50
-                                        }} />
-                                        <Bar barSize={100} dataKey='Cardiomegaly' fill="#5BC0EB" />
-                                        <Bar barSize={100} dataKey='Edema' fill="#FDE74C" />
-                                        <Bar barSize={100} dataKey='Consolidation' fill="#9BC53D" />
-                                        <Bar barSize={100} dataKey='Atelectasis' fill="#E55934" />
-                                        <Bar barSize={100} dataKey='Pleural effusion' fill="#FA7921" />
-                                    </BarChart>
+                                        <YAxis/>
+                                        <Legend align='right' layout='vertical' verticalAlign='middle' content={() => (
+                                            <ul>
+                                                 {
+                                                    data.map((entry, i) => (
+                                                        <li key={i} style={{ color: colors[i], listStyleType: 'square' }}>
+                                                            <p style={{ color: "black" }}>{entry.name}</p>
+                                                        </li>
+                                                    ))
+                                                }
+                                            </ul>
+                                        )}/>
+                                        <Bar dataKey='value'>
+                                            {
+                                                data.map((entry, i ) => (
+                                                    <Cell key={`cell-${i}`} fill={colors[i]} stroke={colors[i]} />
+                                                ))
+                                            }
+                                        </Bar>
+                                        <Line dataKey='threshold'/>
+                                    </ComposedChart>
                                 </Grid>
                                 <Grid container item xs={4} alignContent='center' alignItems='center' justify='center'>
                                     <Button onClick={() => this.updateFeedbackHandler(i, d.userFeedback.id)}>
                                         Update feedback
                                     </Button>
                                 </Grid>
-                                <Grid container item xs={8} >
-                                    <Table style={{ border: '2px solid black', marginRight: '2%', marginBottom: '2%' }}>
+                                <Grid container item xs={8}>
+                                    <Table style={{border: '2px solid black', marginRight: '2%', marginBottom: '2%'}}>
                                         <TableBody>
                                             <TableRow>
                                                 <TableCell align='center'>Cardiomegaly</TableCell>
@@ -148,50 +177,68 @@ class History extends Component {
                                                 <TableCell align='center'>Pleural effusion</TableCell>
                                             </TableRow>
                                             <TableRow>
-                                                <TableCell align='center'>{(d.cardiomegaly * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell
+                                                    align='center'>{(d.cardiomegaly * 100).toFixed(2) + '%'}</TableCell>
                                                 <TableCell align='center'>{(d.edema * 100).toFixed(2) + '%'}</TableCell>
-                                                <TableCell align='center'>{(d.consolidation * 100).toFixed(2) + '%'}</TableCell>
-                                                <TableCell align='center'>{(d.atelectasis * 100).toFixed(2) + '%'}</TableCell>
-                                                <TableCell align='center'>{(d.pleural_effusion * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell
+                                                    align='center'>{(d.consolidation * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell
+                                                    align='center'>{(d.atelectasis * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell
+                                                    align='center'>{(d.pleural_effusion * 100).toFixed(2) + '%'}</TableCell>
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell align='center'>
                                                     <FormControl>
-                                                        <RadioGroup name='cardiomegaly' value={d.userFeedback.cardiomegaly} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes'/>
+                                                        <RadioGroup name='cardiomegaly'
+                                                                    value={d.userFeedback.cardiomegaly}
+                                                                    onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes'
+                                                                              value='Yes'/>
                                                             <FormControlLabel control={<Radio/>} label='No' value='No'/>
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     <FormControl>
-                                                        <RadioGroup name='edema' value={d.userFeedback.edema} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        <RadioGroup name='edema' value={d.userFeedback.edema}
+                                                                    onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes'
+                                                                              value='Yes'/>
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No'/>
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     <FormControl>
-                                                        <RadioGroup name='consolidation' value={d.userFeedback.consolidation} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        <RadioGroup name='consolidation'
+                                                                    value={d.userFeedback.consolidation}
+                                                                    onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes'
+                                                                              value='Yes'/>
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No'/>
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     <FormControl>
-                                                        <RadioGroup name='atelectasis' value={d.userFeedback.atelectasis} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        <RadioGroup name='atelectasis'
+                                                                    value={d.userFeedback.atelectasis}
+                                                                    onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes'
+                                                                              value='Yes'/>
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No'/>
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     <FormControl>
-                                                        <RadioGroup name='pleural_effusion' value={d.userFeedback.pleural_effusion} onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        <RadioGroup name='pleural_effusion'
+                                                                    value={d.userFeedback.pleural_effusion}
+                                                                    onChange={e => this.feedbackChangeHandler(e, d.userFeedback.user_access_details_id)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes'
+                                                                              value='Yes'/>
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No'/>
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
@@ -209,9 +256,9 @@ class History extends Component {
 
     alert = () => (
         <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            anchorOrigin={{vertical: "top", horizontal: "center"}}
             open={this.state.open}
-            onClose={() => this.setState({ open: !this.state.open })}
+            onClose={() => this.setState({open: !this.state.open})}
             autoHideDuration={2000}
             message={this.state.message}
         />
@@ -223,7 +270,7 @@ class History extends Component {
         var newState = [...this.state.data]
         newState[index].userFeedback = {
             ...newState[index].userFeedback,
-                [name]: value
+            [name]: value
         }
         this.setState({
             data: newState
@@ -234,7 +281,7 @@ class History extends Component {
         this.setState({
             loading: true
         })
-        fetch(server+'/feedback/'+id, {
+        fetch(server + '/feedback/' + id, {
             method: 'PUT',
             mode: 'cors',
             body: JSON.stringify({
@@ -276,9 +323,9 @@ class History extends Component {
     }
 
     render() {
-        if(this.state.loading) {
-            return(
-                <Grid container item justify='center' alignItems='center' style={{ minHeight: '80vh' }}>
+        if (this.state.loading) {
+            return (
+                <Grid container item justify='center' alignItems='center' style={{minHeight: '80vh'}}>
                     <CircularProgress
                         disableShrink
                     />

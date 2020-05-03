@@ -3,7 +3,7 @@ import './UploadImage.css';
 import History from '../History/History';
 import {connect} from 'react-redux';
 import {server} from '../../properties';
-import { XAxis, YAxis, Legend, Bar, BarChart} from 'recharts';
+import {XAxis, YAxis, Legend, Bar, BarChart, Cell, ComposedChart, Line} from 'recharts';
 import {
     Button,
     CircularProgress,
@@ -176,6 +176,30 @@ class UploadImage extends Component {
     result = () => {
         if (this.state.responseData.isError === 'false') {
             var d = this.state.responseData.result;
+            const data = [
+                {
+                    'name': 'Cardiomegaly',
+                    'value': (d[2] * 100).toFixed(2),
+                    'threshold': 46.52,
+                }, {
+                    'name': 'Edema',
+                    'value': (d[3] * 100).toFixed(2),
+                    'threshold': 71.05,
+                }, {
+                    'name': 'Consolidation',
+                    'value': (d[4] * 100).toFixed(2),
+                    'threshold': 65.9,
+                }, {
+                    'name': 'Atelectasis',
+                    'value': (d[5] * 100).toFixed(2),
+                    'threshold': 54.93,
+                }, {
+                    'name': 'Pleural Effusion',
+                    'value': (d[6] * 100).toFixed(2),
+                    'threshold': 34.61,
+                }
+            ]
+            const colors = ['#5BC0EB','#FDE74C','#9BC53D','#E55934','#FA7921']
             return(
                 <Grid container justify='center' style={{ marginTop: '2%' }}>
                     <Grid xs={4}>
@@ -187,29 +211,33 @@ class UploadImage extends Component {
                             alt=''/>
                     </Grid>
                     <Grid xs={8}>
-                        <BarChart
+                        <ComposedChart
                             style={{ fontSize: 'calc(5px + 2vmin)'}}
                             width={1000}
                             height={400}
-                            data={[{
-                                'Cardiomegaly': (d[2] * 100).toFixed(2),
-                                'Edema': (d[3] * 100).toFixed(2),
-                                'Consolidation': (d[4] * 100).toFixed(2),
-                                'Atelectasis': (d[5] * 100).toFixed(2),
-                                'Pleural effusion': (d[6] * 100).toFixed(2),
-                            }]}>
+                            data={data}>
                             <XAxis tick={false}/>
                             <YAxis />
-                            <Legend align='right' layout='vertical' verticalAlign='middle' margin={{
-                                left: 50
-                            }} />
-                            <Bar barSize={100} dataKey='Cardiomegaly' fill="#5BC0EB" />
-                            <Bar barSize={100} dataKey='Edema' fill="#FDE74C" />
-                            <Bar barSize={100} dataKey='Consolidation' fill="#9BC53D" />
-                            <Bar barSize={100} dataKey='Atelectasis' fill="#E55934" />
-                            <Bar barSize={100} dataKey='Pleural effusion' fill="#FA7921" />
-
-                        </BarChart>
+                            <Legend align='right' layout='vertical' verticalAlign='middle' content={() => (
+                                <ul>
+                                    {
+                                        data.map((entry, i) => (
+                                            <li key={i} style={{ color: colors[i], listStyleType: 'square' }}>
+                                                <p style={{ color: "black" }}>{entry.name}</p>
+                                            </li>
+                                        ))
+                                    }
+                                </ul>
+                            )}/>
+                            <Bar dataKey='value'>
+                                {
+                                    data.map((entry, i) => (
+                                        <Cell key={`cell-${i}`} fill={colors[i]} stroke={colors[i]} />
+                                    ))
+                                }
+                            </Bar>
+                            <Line dataKey='threshold' />
+                        </ComposedChart>
                     </Grid>
                     <Grid container item xs={4} alignContent='center' alignItems='center' justify='center'>
                         <Button
