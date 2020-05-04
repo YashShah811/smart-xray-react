@@ -38,8 +38,8 @@ class Header extends Component {
                         {
                             this.props.login.login || sessionStorage.getItem('Login')
                                 ? sessionStorage.getItem('UserName') === null
-                                    ? 'Hi, '+this.props.userName.userName
-                                : 'Hi, '+sessionStorage.getItem('UserName')
+                                    ? 'Hi, there'/*+this.props.userName.userName*/
+                                : 'Hi, there'/*+sessionStorage.getItem('UserName')*/
                                 : ''
                         }
                     </Typography>
