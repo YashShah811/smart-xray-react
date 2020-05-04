@@ -32,7 +32,7 @@ class Header extends Component {
             <AppBar position="fixed">
                 <Toolbar>
                     <Typography variant="h6" style={{ flexGrow: 1 }}>
-                        Smart X-Ray
+                        Smart X-Ray <sup>BETA</sup>
                     </Typography>
                     <Typography variant="h6" style={{ flexGrow: 1 }}>
                         {
@@ -46,9 +46,9 @@ class Header extends Component {
                     <Button color="inherit" onClick={() => this.props.historyAction(false)} disabled={!this.props.history.history}>
                         {this.props.login.login || sessionStorage.getItem('Login') ? 'Upload' : ''}
                     </Button>
-                    <Button color="inherit" onClick={() => this.props.historyAction(true)}>
+                    {/*<Button color="inherit" onClick={() => this.props.historyAction(true)}>
                         {this.props.login.login || sessionStorage.getItem('Login') ? 'History' : ''}
-                    </Button>
+                    </Button>*/}
                     <Button color="inherit" onClick={this.logout}>
                         {this.props.login.login || sessionStorage.getItem('Login') ? 'SIGNOUT' : ''}
                     </Button>

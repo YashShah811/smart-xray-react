@@ -63,7 +63,7 @@ class UploadImage extends Component {
             const fileName = event.target.files[0].name;
             const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
             console.log(extension)
-            if (extension === 'jpg' || extension === 'png') {
+            if (extension === 'jpg' || extension === 'png' || extension === 'jpeg') {
                 reader.onloadend = () => {
                     this.setState({
                         invalidFile: false,
@@ -124,33 +124,53 @@ class UploadImage extends Component {
 
     uploadImage = () => {
         return(
-            <Grid container item direction='column' justify='center' alignItems='center' style={{ minHeight: '80vh' }}>
-                <input
-                    color='inherit'
-                    type='file'
-                    accept='image/*'
-                    onChange={this.onChangeHandler}
-                />
-                <img
-                    id="target"
-                    src={this.state.preview}
-                    width="400"
-                    height="400"
-                    alt=''
-                />
-                <br/>
-                <Grid>
-                    <Button
-                        type="submit"
-                        disabled={this.state.invalidFile || this.state.selectedFile === null}
-                        onClick={this.calculate}>
-                        Upload
-                    </Button>
-                    <Button type='reset' onClick={this.goHome}>
-                        Cancel
-                    </Button>
+            <Grid container >
+                <Grid container item xs={4} direction='column' justify='center' alignItems='center' style={{ marginTop: '-55px' }}>
+                    <Typography style={{ padding: '10px' }}>Sample xray</Typography>
+                    <img
+                        id="target"
+                        src={server + '/sample.jpg'}
+                        width="400"
+                        height="400"
+                        alt='sample image'
+                    />
                 </Grid>
-                {this.alert()}
+                <Grid container item direction='column' justify='center' alignItems='center' style={{ minHeight: '80vh' }} xs={4}>
+                    <input
+                        color='inherit'
+                        type='file'
+                        accept='image/*'
+                        onChange={this.onChangeHandler}
+                    />
+                    <img
+                        id="target"
+                        src={this.state.preview}
+                        width="400"
+                        height="400"
+                        alt=''
+                    />
+                    <br/>
+                    <Grid>
+                        <Button
+                            type="submit"
+                            disabled={this.state.invalidFile || this.state.selectedFile === null}
+                            onClick={this.calculate}>
+                            Upload
+                        </Button>
+                        <Button type='reset' onClick={this.goHome}>
+                            Cancel
+                        </Button>
+                    </Grid>
+                    {this.alert()}
+                </Grid>
+                <Grid container xs={4} justify='space-between' alignItems='center' alignContent='center' style={{ minHeight: '80vh' }}>
+                    <ul>
+                        <li>Only jpg, jpeg and png images are valid</li>
+                        <li>Please upload properly cropped and aligned image<br/>(Refer to the sample xray)</li>
+                        <li>Please upload only black and white xray image</li>
+                        <li>At this moment, we support only chest xrays</li>
+                    </ul>
+                </Grid>
             </Grid>
         )
     }
@@ -220,6 +240,9 @@ class UploadImage extends Component {
                             <YAxis />
                             <Legend align='right' layout='vertical' verticalAlign='middle' content={() => (
                                 <ul>
+                                    <li style={{ color: 'black', listStyleType: 'square' }}>
+                                        <p style={{ color: "black" }}>cut-off line</p>
+                                    </li><br/>
                                     {
                                         data.map((entry, i) => (
                                             <li key={i} style={{ color: colors[i], listStyleType: 'square' }}>
@@ -236,10 +259,15 @@ class UploadImage extends Component {
                                     ))
                                 }
                             </Bar>
-                            <Line dataKey='threshold' />
+                            <Line dataKey='threshold' stroke='black' />
                         </ComposedChart>
                     </Grid>
                     <Grid container item xs={4} alignContent='center' alignItems='center' justify='center'>
+                        <ul>
+                            <li>Bar graph of any condition above the cut-off line indicates the positive result of that condition in the supplied xray</li>
+                            <li>Please submit your analysis of xray conditions through the table below the graph.<br/>Select Yes/No for all conditions and press 'Submit Feedback' button</li>
+                            <li>Please refrain from submitting incomplete/wrong feedback</li>
+                        </ul>
                         <Button
                             onClick={this.submitFeedback}
                             disabled={
