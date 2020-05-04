@@ -8,6 +8,7 @@ function App() {
       <Fragment>
           <Header/>
           <Login/>
+          <footer  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p>A product by Deep Brain Lab</p></footer>
       </Fragment>
     // <div className="App">
     //   <header className="App-header">

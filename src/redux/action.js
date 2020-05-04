@@ -2,6 +2,7 @@ export const LOGIN = 'LOGIN'
 export const USER_NAME = 'USER_NAME'
 export const USER_ID = 'USER_ID'
 export const HISTORY = 'HISTORY'
+export const RESULT = 'RESULT'
 
 export const login = (status) => {
     return{
@@ -27,6 +28,13 @@ export const userId = (userId) => {
 export const history = (status) => {
     return {
         type: HISTORY,
+        payload: status
+    }
+}
+
+export const result = (status) => {
+    return {
+        type: RESULT,
         payload: status
     }
 }

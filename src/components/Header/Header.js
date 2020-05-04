@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {login, history} from '../../redux/action';
+import {login, history, result} from '../../redux/action';
 import {AppBar, Toolbar, Typography, Button } from '@material-ui/core';
 import {withStyles} from "@material-ui/core/styles";
 
@@ -43,7 +43,7 @@ class Header extends Component {
                                 : ''
                         }
                     </Typography>
-                    <Button color="inherit" onClick={() => this.props.historyAction(false)} disabled={!this.props.history.history}>
+                    <Button color="inherit" onClick={() => this.props.resultAction(false)}>
                         {this.props.login.login || sessionStorage.getItem('Login') ? 'Upload' : ''}
                     </Button>
                     {/*<Button color="inherit" onClick={() => this.props.historyAction(true)}>
@@ -82,6 +82,9 @@ const mapDispatchToProps = dispatch => ({
     },
     historyAction: status => {
         dispatch(history(status))
+    },
+    resultAction: status => {
+        dispatch(result(status))
     }
 })
 

@@ -16,6 +16,7 @@ import {
     RadioGroup, FormControlLabel, Radio, Table, FormControl
 } from '@material-ui/core';
 import {withStyles} from "@material-ui/core/styles";
+import {history, result} from "../../redux/action";
 
 const styles = theme => ({
     upload: {
@@ -63,7 +64,7 @@ class UploadImage extends Component {
             const fileName = event.target.files[0].name;
             const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
             console.log(extension)
-            if (extension === 'jpg' || extension === 'png' || extension === 'jpeg') {
+            if (extension === 'jpg' || extension === 'png' || extension === 'jpeg' || extension === 'JPG' || extension === 'PNG' || extension === 'JPEG') {
                 reader.onloadend = () => {
                     this.setState({
                         invalidFile: false,
@@ -114,8 +115,11 @@ class UploadImage extends Component {
                     } else {
                         this.setState({
                             loading: false,
-                            responseData: responseJson.data
+                            responseData: responseJson.data,
+                            preview: null,
+                            selectedFile: null
                         })
+                        this.props.resultAction(true)
                     }
                 })
                 .catch(error => console.log(error))
@@ -125,7 +129,7 @@ class UploadImage extends Component {
     uploadImage = () => {
         return(
             <Grid container >
-                <Grid container item xs={4} direction='column' justify='center' alignItems='center' style={{ marginTop: '-55px' }}>
+                <Grid container item xs={4} direction='column' justify='center' alignItems='center' style={{ marginTop: '-60px' }}>
                     <Typography style={{ padding: '10px' }}>Sample xray</Typography>
                     <img
                         id="target"
@@ -265,10 +269,12 @@ class UploadImage extends Component {
                     <Grid container item xs={4} alignContent='center' alignItems='center' justify='center'>
                         <ul>
                             <li>Bar graph of any condition above the cut-off line indicates the positive result of that condition in the supplied xray</li>
-                            <li>Please submit your analysis of xray conditions through the table below the graph.<br/>Select Yes/No for all conditions and press 'Submit Feedback' button</li>
+                            <li>Please submit your analysis of xray conditions through the table below the graph.</li>
+                            <li>Select Yes/No for all conditions and press 'Submit Feedback' button</li>
                             <li>Please refrain from submitting incomplete/wrong feedback</li>
                         </ul>
                         <Button
+                            variant='contained'
                             onClick={this.submitFeedback}
                             disabled={
                                     this.state.feedback.cardiomegaly === null ||
@@ -365,6 +371,7 @@ class UploadImage extends Component {
 
     submitFeedback = () => {
         console.log(this.state.feedback)
+        this.props.resultAction(false)
         this.setState({
             loading: true
         })
@@ -414,8 +421,7 @@ class UploadImage extends Component {
                         />
                     </Grid>
                 )
-            } else if (this.state.responseData !== null) {
-                console.log(this.state)
+            } else if (this.props.result.result) {
                 return this.result();
             } else if (this.state.limit) {
                 return (
@@ -441,7 +447,14 @@ class UploadImage extends Component {
 
 const mapStateToProps = state => ({
     userId: state.userId,
-    history: state.history
+    history: state.history,
+    result: state.result
 })
 
-export default connect(mapStateToProps, null)(withStyles(styles)(UploadImage));
+const mapDispatchToProps = dispatch => ({
+    resultAction: status => {
+        dispatch(result(status))
+    }
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UploadImage));
