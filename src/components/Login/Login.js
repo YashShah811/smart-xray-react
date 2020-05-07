@@ -63,10 +63,8 @@ class Login extends Component {
                 this.props.loginAction(true)
                 sessionStorage.setItem('Login', this.props.login.login)
             }
-            console.log('Response : ', response)
             return response.json()
         }).then(responseJson => {
-            console.log('ResponseJson : ', responseJson)
             if(responseJson.data === null) {
                 this.setState({
                     loading: false,

@@ -63,7 +63,6 @@ class UploadImage extends Component {
         if(file) {
             const fileName = event.target.files[0].name;
             const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-            console.log(extension)
             if (extension === 'jpg' || extension === 'png' || extension === 'jpeg' || extension === 'JPG' || extension === 'PNG' || extension === 'JPEG') {
                 reader.onloadend = () => {
                     this.setState({
@@ -106,7 +105,6 @@ class UploadImage extends Component {
                 }
             }).then(response => response.json())
                 .then(responseJson => {
-                    console.log('Response: ', responseJson)
                     if (responseJson.data === null) {
                         this.setState({
                             loading: false,
@@ -388,7 +386,6 @@ class UploadImage extends Component {
     }
 
     submitFeedback = () => {
-        console.log(this.state.feedback)
         this.props.resultAction(false)
         this.setState({
             loading: true
@@ -426,7 +423,6 @@ class UploadImage extends Component {
                 })
             }
         })
-        console.log(this.state)
     }
 
     render() {
