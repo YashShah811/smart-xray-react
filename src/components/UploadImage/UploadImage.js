@@ -3,7 +3,7 @@ import './UploadImage.css';
 import History from '../History/History';
 import {connect} from 'react-redux';
 import {server} from '../../properties';
-import {XAxis, YAxis, Legend, Bar, BarChart, Cell, ComposedChart, Line} from 'recharts';
+import {XAxis, YAxis, Legend, Bar, Cell, ComposedChart, Line, ResponsiveContainer} from 'recharts';
 import {
     Button,
     CircularProgress,
@@ -13,7 +13,7 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    RadioGroup, FormControlLabel, Radio, Table, FormControl
+    RadioGroup, FormControlLabel, Radio, Table, FormControl, TableContainer
 } from '@material-ui/core';
 import {withStyles} from "@material-ui/core/styles";
 import {history, result} from "../../redux/action";
@@ -128,18 +128,25 @@ class UploadImage extends Component {
 
     uploadImage = () => {
         return(
-            <Grid container >
-                <Grid container item xs={4} direction='column' justify='center' alignItems='center' style={{ marginTop: '-60px' }}>
-                    <Typography style={{ padding: '10px' }}>Sample xray</Typography>
+            <div style={{ flexGrow: 1, padding: '7%' }}>
+            <Grid container wrap='wrap' alignItems='center' alignContent='center' justify='center' spacing={2} >
+                <Grid container item sm direction='column' justify='center' alignItems='center' wrap='wrap'>
+                    <Typography style={{ padding: '2px' }}>Sample xray</Typography>
                     <img
                         id="target"
                         src={server + '/sample.jpg'}
-                        width="400"
-                        height="400"
+                        style={{ maxWidth: '100%' }}
                         alt='sample image'
                     />
+                    <br/>
+                    <Grid>
+                        <Button disabled style={{ padding: '6px 8px' }}>
+                        </Button>
+                        <Button disabled>
+                        </Button>
+                    </Grid>
                 </Grid>
-                <Grid container item direction='column' justify='center' alignItems='center' style={{ minHeight: '80vh' }} xs={4}>
+                <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
                     <input
                         color='inherit'
                         type='file'
@@ -149,8 +156,7 @@ class UploadImage extends Component {
                     <img
                         id="target"
                         src={this.state.preview}
-                        width="400"
-                        height="400"
+                        style={{ maxWidth: '100%' }}
                         alt=''
                     />
                     <br/>
@@ -167,7 +173,7 @@ class UploadImage extends Component {
                     </Grid>
                     {this.alert()}
                 </Grid>
-                <Grid container xs={4} justify='space-between' alignItems='center' alignContent='center' style={{ minHeight: '80vh' }}>
+                <Grid container item sm justify='center' alignItems='center' alignContent='center' wrap='wrap'>
                     <ul>
                         <li>Only jpg, jpeg and png images are valid</li>
                         <li>Please upload properly cropped and aligned image<br/>(Refer to the sample xray)</li>
@@ -176,15 +182,17 @@ class UploadImage extends Component {
                     </ul>
                 </Grid>
             </Grid>
+            </div>
         )
     }
 
     goHome = () => {
-        this.setState({
-            selectedFile: null,
-            preview: null,
-            limit: null
-        })
+        window.location.reload();
+        // this.setState({
+        //     selectedFile: null,
+        //     preview: null,
+        //     limit: null
+        // })
     }
 
     alert = () => (
@@ -199,7 +207,7 @@ class UploadImage extends Component {
 
     result = () => {
         if (this.state.responseData.isError === 'false') {
-            var d = this.state.responseData.result;
+            const d = this.state.responseData.result;
             const data = [
                 {
                     'name': 'Cardiomegaly',
@@ -225,130 +233,140 @@ class UploadImage extends Component {
             ]
             const colors = ['#5BC0EB','#FDE74C','#9BC53D','#E55934','#FA7921']
             return(
-                <Grid container justify='center' style={{ marginTop: '2%' }}>
-                    <Grid xs={4}>
-                        <img
-                            style={{ display: 'block', marginRight: 'auto', marginLeft: 'auto' }}
-                            src={server + '/' + d[1].split('.')[0] + '_' + sessionStorage.getItem('UserId') + '.' + d[1].split('.')[1]}
-                            height='400'
-                            width='400'
-                            alt=''/>
-                    </Grid>
-                    <Grid xs={8}>
-                        <ComposedChart
-                            style={{ fontSize: 'calc(5px + 2vmin)'}}
-                            width={1000}
-                            height={400}
-                            data={data}>
-                            <XAxis tick={false}/>
-                            <YAxis />
-                            <Legend align='right' layout='vertical' verticalAlign='middle' content={() => (
+                <div style={{ flexGrow: 1, padding: '5%' }}>
+                    <Grid container justify='center' wrap='wrap' spacing={1} direction='column'>
+                        <Grid item sm container wrap='wrap' justify='center' alignItems='center' spacing={1} >
+                            <Grid container item sm alignContent='center' alignItems='center' justify='center' wrap='wrap'>
+                                <img
+                                    src={server + '/' + d[1].split('.')[0] + '_' + sessionStorage.getItem('UserId') + '.' + d[1].split('.')[1]}
+                                    style={{ maxWidth: '100%' }}
+                                    alt=''/>
+                            </Grid>
+                            <Grid container item sm alignContent='center' alignItems='center' justify='center' wrap='wrap'>
+                                <TableContainer>
+                                    <ResponsiveContainer height={400} minWidth={700}>
+                                        <ComposedChart data={data}>
+                                            <XAxis tick={false}/>
+                                            <YAxis />
+                                            <Legend
+                                                align='right'
+                                                layout='vertical'
+                                                verticalAlign='middle'
+                                                content={() => (
+                                                    <ul>
+                                                        <li style={{ color: 'black', listStyleType: 'square' }}>
+                                                            <Typography variant='caption' style={{ color: "black" }}>cut-off line</Typography>
+                                                        </li>
+                                                        {
+                                                            data.map((entry, i) => (
+                                                                <li key={i} style={{ color: colors[i], listStyleType: 'square' }}>
+                                                                    <Typography variant='caption' style={{ color: "black" }}>{entry.name}</Typography>
+                                                                </li>
+                                                            ))
+                                                        }
+                                                    </ul>
+                                                )}/>
+                                            <Bar dataKey='value'>
+                                                {
+                                                    data.map((entry, i) => (
+                                                        <Cell key={`cell-${i}`} fill={colors[i]} stroke={colors[i]} />
+                                                    ))
+                                                }
+                                            </Bar>
+                                            <Line dataKey='threshold' stroke='black' />
+                                        </ComposedChart>
+                                    </ResponsiveContainer>
+                                </TableContainer>
+                            </Grid>
+                        </Grid>
+                        <Grid item sm container wrap='wrap' alignContent='center' alignItems='center' justify='center' spacing={1}>
+                            <Grid container item sm alignContent='center' alignItems='center' justify='center' wrap='wrap'>
                                 <ul>
-                                    <li style={{ color: 'black', listStyleType: 'square' }}>
-                                        <p style={{ color: "black" }}>cut-off line</p>
-                                    </li><br/>
-                                    {
-                                        data.map((entry, i) => (
-                                            <li key={i} style={{ color: colors[i], listStyleType: 'square' }}>
-                                                <p style={{ color: "black" }}>{entry.name}</p>
-                                            </li>
-                                        ))
-                                    }
+                                    <li>Bar graph of any condition above the cut-off line indicates the positive result of that condition in the supplied xray</li>
+                                    <li>Please submit your analysis of xray conditions through the table below the graph.</li>
+                                    <li>Select Yes/No for all conditions and press 'Submit Feedback' button</li>
+                                    <li>Please refrain from submitting incomplete/wrong feedback</li>
                                 </ul>
-                            )}/>
-                            <Bar dataKey='value'>
-                                {
-                                    data.map((entry, i) => (
-                                        <Cell key={`cell-${i}`} fill={colors[i]} stroke={colors[i]} />
-                                    ))
-                                }
-                            </Bar>
-                            <Line dataKey='threshold' stroke='black' />
-                        </ComposedChart>
+                                <Button
+                                    variant='contained'
+                                    onClick={this.submitFeedback}
+                                    disabled={
+                                        this.state.feedback.cardiomegaly === null ||
+                                        this.state.feedback.edema === null ||
+                                        this.state.feedback.consolidation === null ||
+                                        this.state.feedback.atelectasis === null ||
+                                        this.state.feedback.pleural_effusion === null
+                                    }>
+                                    Submit feedback
+                                </Button>
+                            </Grid>
+                            <Grid container item sm wrap='wrap'>
+                                <TableContainer>
+                                    <Table style={{ border: '2px solid black', minWidth: 650 }}>
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell align='center'>Cardiomegaly</TableCell>
+                                                <TableCell align='center'>Edema</TableCell>
+                                                <TableCell align='center'>Consolidation</TableCell>
+                                                <TableCell align='center'>Atelectasis</TableCell>
+                                                <TableCell align='center'>Pleural effusion</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell align='center'>{(d[2] * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d[3] * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d[4] * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d[5] * 100).toFixed(2) + '%'}</TableCell>
+                                                <TableCell align='center'>{(d[6] * 100).toFixed(2) + '%'}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='cardiomegaly' onChange={e => this.feedbackChangeHandler(e)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes'/>
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No'/>
+                                                        </RadioGroup>
+                                                    </FormControl>
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='edema' onChange={e => this.feedbackChangeHandler(e)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        </RadioGroup>
+                                                    </FormControl>
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='consolidation' onChange={e => this.feedbackChangeHandler(e)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        </RadioGroup>
+                                                    </FormControl>
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='atelectasis' onChange={e => this.feedbackChangeHandler(e)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        </RadioGroup>
+                                                    </FormControl>
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControl>
+                                                        <RadioGroup name='pleural_effusion' onChange={e => this.feedbackChangeHandler(e)}>
+                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                        </RadioGroup>
+                                                    </FormControl>
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                        </Grid>
                     </Grid>
-                    <Grid container item xs={4} alignContent='center' alignItems='center' justify='center'>
-                        <ul>
-                            <li>Bar graph of any condition above the cut-off line indicates the positive result of that condition in the supplied xray</li>
-                            <li>Please submit your analysis of xray conditions through the table below the graph.</li>
-                            <li>Select Yes/No for all conditions and press 'Submit Feedback' button</li>
-                            <li>Please refrain from submitting incomplete/wrong feedback</li>
-                        </ul>
-                        <Button
-                            variant='contained'
-                            onClick={this.submitFeedback}
-                            disabled={
-                                    this.state.feedback.cardiomegaly === null ||
-                                    this.state.feedback.edema === null ||
-                                    this.state.feedback.consolidation === null ||
-                                    this.state.feedback.atelectasis === null ||
-                                    this.state.feedback.pleural_effusion === null
-                            }>
-                            Submit feedback
-                        </Button>
-                    </Grid>
-                    <Grid container item xs={8}>
-                        <Table style={{ border: '2px solid black', marginRight: '2%', marginBottom: '2%' }}>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell align='center'>Cardiomegaly</TableCell>
-                                    <TableCell align='center'>Edema</TableCell>
-                                    <TableCell align='center'>Consolidation</TableCell>
-                                    <TableCell align='center'>Atelectasis</TableCell>
-                                    <TableCell align='center'>Pleural effusion</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell align='center'>{(d[2] * 100).toFixed(2) + '%'}</TableCell>
-                                    <TableCell align='center'>{(d[3] * 100).toFixed(2) + '%'}</TableCell>
-                                    <TableCell align='center'>{(d[4] * 100).toFixed(2) + '%'}</TableCell>
-                                    <TableCell align='center'>{(d[5] * 100).toFixed(2) + '%'}</TableCell>
-                                    <TableCell align='center'>{(d[6] * 100).toFixed(2) + '%'}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell align='center'>
-                                        <FormControl>
-                                            <RadioGroup name='cardiomegaly' onChange={e => this.feedbackChangeHandler(e)}>
-                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes'/>
-                                                <FormControlLabel control={<Radio/>} label='No' value='No'/>
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </TableCell>
-                                    <TableCell align='center'>
-                                        <FormControl>
-                                            <RadioGroup name='edema' onChange={e => this.feedbackChangeHandler(e)}>
-                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </TableCell>
-                                    <TableCell align='center'>
-                                        <FormControl>
-                                            <RadioGroup name='consolidation' onChange={e => this.feedbackChangeHandler(e)}>
-                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </TableCell>
-                                    <TableCell align='center'>
-                                        <FormControl>
-                                            <RadioGroup name='atelectasis' onChange={e => this.feedbackChangeHandler(e)}>
-                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </TableCell>
-                                    <TableCell align='center'>
-                                        <FormControl>
-                                            <RadioGroup name='pleural_effusion' onChange={e => this.feedbackChangeHandler(e)}>
-                                                <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                <FormControlLabel control={<Radio/>} label='No' value='No' />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </Grid>
-                </Grid>
+                </div>
             )
         } else {
             this.setState({
