@@ -3,7 +3,7 @@ import './UploadImage.css';
 import History from '../History/History';
 import {connect} from 'react-redux';
 import {server} from '../../properties';
-import {XAxis, YAxis, Legend, Bar, Cell, ComposedChart, Line, ResponsiveContainer} from 'recharts';
+import {XAxis, YAxis, Legend, Bar, Cell, ComposedChart, Line, ResponsiveContainer, Tooltip} from 'recharts';
 import {
     Button,
     CircularProgress,
@@ -13,10 +13,11 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    RadioGroup, FormControlLabel, Radio, Table, FormControl, TableContainer
+    RadioGroup, FormControlLabel, Radio, Table, FormControl, TableContainer, List, Paper
 } from '@material-ui/core';
 import {withStyles} from "@material-ui/core/styles";
 import {history, result} from "../../redux/action";
+import { threshold } from '../../constants/threshold';
 
 const styles = theme => ({
     upload: {
@@ -210,23 +211,23 @@ class UploadImage extends Component {
                 {
                     'name': 'Cardiomegaly',
                     'value': (d[2] * 100).toFixed(2),
-                    'threshold': 46.52,
+                    'threshold': threshold.Cardiomegaly,
                 }, {
                     'name': 'Edema',
                     'value': (d[3] * 100).toFixed(2),
-                    'threshold': 71.05,
+                    'threshold': threshold.Edema,
                 }, {
                     'name': 'Consolidation',
                     'value': (d[4] * 100).toFixed(2),
-                    'threshold': 65.9,
+                    'threshold': threshold.Consolidation,
                 }, {
                     'name': 'Atelectasis',
                     'value': (d[5] * 100).toFixed(2),
-                    'threshold': 54.93,
+                    'threshold': threshold.Atelectasis,
                 }, {
                     'name': 'Pleural Effusion',
                     'value': (d[6] * 100).toFixed(2),
-                    'threshold': 34.61,
+                    'threshold': threshold.Pleural_Effusion,
                 }
             ]
             const colors = ['#5BC0EB','#FDE74C','#9BC53D','#E55934','#FA7921']
@@ -244,25 +245,18 @@ class UploadImage extends Component {
                                 <TableContainer>
                                     <ResponsiveContainer height={400} minWidth={700}>
                                         <ComposedChart data={data}>
-                                            <XAxis tick={false}/>
+                                            <XAxis dataKey='name'/>
                                             <YAxis />
+                                            <Tooltip />
                                             <Legend
-                                                align='right'
-                                                layout='vertical'
-                                                verticalAlign='middle'
+                                                align='center'
+                                                verticalAlign='bottom'
                                                 content={() => (
-                                                    <ul>
-                                                        <li style={{ color: 'black', listStyleType: 'square' }}>
-                                                            <Typography variant='caption' style={{ color: "black" }}>cut-off line</Typography>
-                                                        </li>
-                                                        {
-                                                            data.map((entry, i) => (
-                                                                <li key={i} style={{ color: colors[i], listStyleType: 'square' }}>
-                                                                    <Typography variant='caption' style={{ color: "black" }}>{entry.name}</Typography>
-                                                                </li>
-                                                            ))
-                                                        }
-                                                    </ul>
+                                                    <List style={{ display: 'flex', flexDirection: "row", flexWrap: 'wrap', paddingLeft: '10%' }}>
+                                                            <li style={{ color: 'black', listStyleType: 'square', marginRight: '5%' }}>
+                                                                <Typography variant='caption' style={{ color: "black" }}>cut-off line</Typography>
+                                                            </li>
+                                                    </List>
                                                 )}/>
                                             <Bar dataKey='value'>
                                                 {
