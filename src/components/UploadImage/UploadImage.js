@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './UploadImage.css';
 import History from '../History/History';
-import {connect} from 'react-redux';
-import {server} from '../../properties';
-import {XAxis, YAxis, Legend, Bar, Cell, ComposedChart, Line, ResponsiveContainer, Tooltip} from 'recharts';
+import { connect } from 'react-redux';
+import { server } from '../../properties';
+import { XAxis, YAxis, Legend, Bar, Cell, ComposedChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
 import {
     Button,
     CircularProgress,
@@ -13,11 +13,17 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    RadioGroup, FormControlLabel, Radio, Table, FormControl, TableContainer, List, Paper
+    RadioGroup, FormControlLabel, Radio, Table, FormControl, TableContainer, List, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Checkbox, FormGroup
 } from '@material-ui/core';
-import {withStyles} from "@material-ui/core/styles";
-import {history, result} from "../../redux/action";
+import { withStyles } from "@material-ui/core/styles";
+import { history, result } from "../../redux/action";
 import { threshold } from '../../constants/threshold';
+import { PhotoCamera } from '@material-ui/icons';
+import { styled } from '@material-ui/styles';
+
+const Input = styled('input')({
+    display: 'none',
+});
 
 const styles = theme => ({
     upload: {
@@ -50,7 +56,8 @@ class UploadImage extends Component {
                 atelectasis: null,
                 pleural_effusion: null
             },
-            feedbackSubmitted: false
+            feedbackSubmitted: false,
+            inputSelection: 0,
         }
     }
 
@@ -61,7 +68,7 @@ class UploadImage extends Component {
             selectedFile: null,
             preview: null
         })
-        if(file) {
+        if (file) {
             const fileName = event.target.files[0].name;
             const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
             if (extension === 'jpg' || extension === 'png' || extension === 'jpeg' || extension === 'JPG' || extension === 'PNG' || extension === 'JPEG') {
@@ -84,6 +91,7 @@ class UploadImage extends Component {
     }
 
     calculate = () => {
+        console.log('State: ', this.state)
         this.setState({
             loading: true
         })
@@ -97,13 +105,21 @@ class UploadImage extends Component {
         } else {
             let data = new FormData();
             data.append('image', this.state.selectedFile)
+            data.append('cardiomegaly', this.state.cardiomegaly)
+            data.append('edema', this.state.edema)
+            data.append('consolidation', this.state.consolidation)
+            data.append('atelectasis', this.state.atelectasis)
+            data.append('pleural_effusion', this.state.pleural_effusion)
+            data.append('none', this.state.none)
+
             fetch(server + "/calculate/" + sessionStorage.getItem('UserId'), {
                 method: 'POST',
                 mode: 'cors',
                 body: data,
                 headers: {
+                    "Accept": "application/form-data",
                     "Access-Control-Allow-Origin": "*"
-                }
+                },
             }).then(response => response.json())
                 .then(responseJson => {
                     if (responseJson.data === null) {
@@ -116,9 +132,11 @@ class UploadImage extends Component {
                             loading: false,
                             responseData: responseJson.data,
                             preview: null,
-                            selectedFile: null
+                            selectedFile: null,
+                            open: true,
+                            alertMessage: 'File submitted successfully'
                         })
-                        this.props.resultAction(true)
+                        // this.props.resultAction(true)
                     }
                 })
                 .catch(error => console.log(error))
@@ -126,61 +144,83 @@ class UploadImage extends Component {
     }
 
     uploadImage = () => {
-        return(
-            <div style={{ flexGrow: 1, padding: '7%' }}>
-            <Grid container wrap='wrap' alignItems='center' alignContent='center' justify='center' spacing={2} >
-                <Grid container item sm direction='column' justify='center' alignItems='center' wrap='wrap'>
-                    <Typography style={{ padding: '2px' }}>Sample xray</Typography>
-                    <img
-                        id="target"
-                        src={server + '/sample.jpg'}
-                        style={{ maxWidth: '100%' }}
-                        alt='sample image'
-                    />
-                    <br/>
-                    <Grid>
-                        <Button disabled style={{ padding: '6px 8px' }}>
-                        </Button>
-                        <Button disabled>
-                        </Button>
+        return (
+            <div style={{ flexGrow: 1, padding: '3%', margin: '3%' }}>
+                <Grid container direction='row' sm wrap='wrap' alignItems='center' alignContent='center' justify='center' spacing={2} >
+                    <Grid container sm={4} direction='column' justify='center' alignItems='center' wrap='wrap'>
+                        <Grid container item sm direction='column' justify='center' alignItems='center' wrap='wrap'>
+                            <Typography style={{ padding: '5px 10px'}} variant='h4'>Instructions</Typography>
+                            <Typography style={{ padding: '2px' }}>Sample xray</Typography>
+                            <img
+                                id="target"
+                                src={server + '/sample.jpg'}
+                                style={{ maxWidth: '100%' }}
+                                alt='sample image'
+                            />
+                            <br />
+                            <ul>
+                                <li>Only jpg, jpeg and png images are valid</li>
+                                <li>Please upload properly cropped and aligned image<br />(Refer to the sample xray)</li>
+                                <li>Please upload only black and white xray image</li>
+                                <li>Only chest xrays are supported</li>
+                            </ul>
+                        </Grid>
+                    </Grid>
+                    <Grid container direction='column' sm wrap='wrap'>
+                        <Grid container direction='row' justify='center' alignItems='center' sm wrap='wrap'>
+                            <Grid container item direction='column' justify='flex-start' alignItems='center' sm wrap='wrap'>
+                                {/* <Typography style={{ padding: '5px 10px', marginTop: '-10%', marginBottom: '15%' }} variant='h4'>2. Upload</Typography> */}
+
+                                <label htmlFor='upload-button'>
+                                    <Input
+                                        color='primary'
+                                        id='upload-button'
+                                        type='file'
+                                        accept='image/*'
+                                        onChange={this.onChangeHandler}
+                                    />
+                                    <Button variant="contained" endIcon={<PhotoCamera />} component='span'>
+                                        Upload
+                                    </Button>
+                                </label>
+                                <img
+                                    id="target"
+                                    src={this.state.preview}
+                                    style={{ maxWidth: '100%' }}
+                                    alt=''
+                                />
+                                {this.alert()}
+                            </Grid>
+                            <Grid container item direction='row' justify='flex-start' alignItems='stretch' sm wrap='wrap'>
+                                {/* <Typography style={{ padding: '5px 10px', marginTop: '-10%', marginBottom: '17.5%' }} variant='h4'>3. Select</Typography> */}
+
+                                <Typography variant='h4' >Please select the condition(s) for the uploaded X-Ray</Typography><br />
+                                <FormGroup>
+                                    <FormControlLabel control={<Checkbox color='primary' name='cardiomegaly' onChange={this.onChange} />} label="Cardiomegaly" />
+                                    <FormControlLabel control={<Checkbox color='primary' name='edema' onChange={this.onChange} />} label="Edema" />
+                                    <FormControlLabel control={<Checkbox color='primary' name='consolidation' onChange={this.onChange} />} label="Consolidation" />
+                                    <FormControlLabel control={<Checkbox color='primary' name='atelectasis' onChange={this.onChange} />} label="Atelectasis" />
+                                    <FormControlLabel control={<Checkbox color='primary' name='pleural_effusion' onChange={this.onChange} />} label="Pleural Effusion" />
+                                    <FormControlLabel control={<Checkbox color='primary' name='none' onChange={this.onChange} />} label="None" />
+                                </FormGroup>
+                            </Grid>
+                        </Grid>
+                        <Grid container item direction='row' justify='center' alignItems='baseline' sm wrap='wrap'>
+                            <Button
+                                type="submit"
+                                disabled={this.state.invalidFile || this.state.selectedFile === null || this.state.inputSelection === 0}
+                                onClick={this.calculate}
+                                variant='contained'
+                                style={{ marginRight: '5%', marginTop: '7.5%' }}
+                            >
+                                Submit
+                            </Button>
+                            <Button type='reset' onClick={this.goHome} variant='contained'>
+                                Cancel
+                            </Button>
+                        </Grid>
                     </Grid>
                 </Grid>
-                <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
-                    <input
-                        color='inherit'
-                        type='file'
-                        accept='image/*'
-                        onChange={this.onChangeHandler}
-                    />
-                    <img
-                        id="target"
-                        src={this.state.preview}
-                        style={{ maxWidth: '100%' }}
-                        alt=''
-                    />
-                    <br/>
-                    <Grid>
-                        <Button
-                            type="submit"
-                            disabled={this.state.invalidFile || this.state.selectedFile === null}
-                            onClick={this.calculate}>
-                            Upload
-                        </Button>
-                        <Button type='reset' onClick={this.goHome}>
-                            Cancel
-                        </Button>
-                    </Grid>
-                    {this.alert()}
-                </Grid>
-                <Grid container item sm justify='center' alignItems='center' alignContent='center' wrap='wrap'>
-                    <ul>
-                        <li>Only jpg, jpeg and png images are valid</li>
-                        <li>Please upload properly cropped and aligned image<br/>(Refer to the sample xray)</li>
-                        <li>Please upload only black and white xray image</li>
-                        <li>At this moment, we support only chest xrays</li>
-                    </ul>
-                </Grid>
-            </Grid>
             </div>
         )
     }
@@ -194,18 +234,45 @@ class UploadImage extends Component {
         // })
     }
 
+    onChange = (event) => {
+        this.setState({
+            ...this.state,
+            [event.target.name]: event.target.checked,
+            inputSelection: event.target.checked === true ? this.state.inputSelection + 1 : (this.state.inputSelection === 0 ? 0 : this.state.inputSelection - 1)
+        })
+    }
+
     alert = () => (
         <Snackbar
-            anchorOrigin={{vertical: "top", horizontal: "center"}}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
             open={this.state.open}
-            onClose={() => this.setState({open: !this.state.open})}
+            onClose={() => this.setState({ open: !this.state.open })}
             autoHideDuration={2000}
             message={this.state.alertMessage}
         />
     )
 
     result = () => {
-        if (this.state.responseData.isError === 'false') {
+        if (this.state.responseData.isError === 'true' && this.state.responseData.message == 'Raising error: unwantedImage') {
+            return (
+                <Dialog
+                    open={this.state.responseData.isError === 'true' && this.state.responseData.message == 'Raising error: unwantedImage'}
+                    onClose={this.goHome}
+                >
+                    <DialogTitle style={{ backgroundColor: '#3F51B5', color: 'white' }}>{"Invalid Image"}</DialogTitle>
+                    <DialogContent style={{ marginTop: 20 }}>
+                        <DialogContentText color='black'>
+                            Please upload valid chest x-ray image.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.goHome}>
+                            OK
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )
+        } else if (this.state.responseData.isError === 'false') {
             const d = this.state.responseData.result;
             const data = [
                 {
@@ -230,8 +297,8 @@ class UploadImage extends Component {
                     'threshold': threshold.Pleural_Effusion,
                 }
             ]
-            const colors = ['#5BC0EB','#FDE74C','#9BC53D','#E55934','#FA7921']
-            return(
+            const colors = ['#5BC0EB', '#FDE74C', '#9BC53D', '#E55934', '#FA7921']
+            return (
                 <div style={{ flexGrow: 1, padding: '5%' }}>
                     <Grid container justify='center' wrap='wrap' spacing={1} direction='column'>
                         <Grid item sm container wrap='wrap' justify='center' alignItems='center' spacing={1} >
@@ -239,13 +306,13 @@ class UploadImage extends Component {
                                 <img
                                     src={server + '/' + d[1].split('.')[0] + '_' + sessionStorage.getItem('UserId') + '.' + d[1].split('.')[1]}
                                     style={{ maxWidth: '100%' }}
-                                    alt=''/>
+                                    alt='' />
                             </Grid>
                             <Grid container item sm alignContent='center' alignItems='center' justify='center' wrap='wrap'>
                                 <TableContainer>
                                     <ResponsiveContainer height={400} minWidth={700}>
                                         <ComposedChart data={data}>
-                                            <XAxis dataKey='name'/>
+                                            <XAxis dataKey='name' />
                                             <YAxis />
                                             <Tooltip />
                                             <Legend
@@ -253,11 +320,11 @@ class UploadImage extends Component {
                                                 verticalAlign='bottom'
                                                 content={() => (
                                                     <List style={{ display: 'flex', flexDirection: "row", flexWrap: 'wrap', paddingLeft: '10%' }}>
-                                                            <li style={{ color: 'black', listStyleType: 'square', marginRight: '5%' }}>
-                                                                <Typography variant='caption' style={{ color: "black" }}>cut-off line</Typography>
-                                                            </li>
+                                                        <li style={{ color: 'black', listStyleType: 'square', marginRight: '5%' }}>
+                                                            <Typography variant='caption' style={{ color: "black" }}>cut-off line</Typography>
+                                                        </li>
                                                     </List>
-                                                )}/>
+                                                )} />
                                             <Bar dataKey='value'>
                                                 {
                                                     data.map((entry, i) => (
@@ -314,40 +381,40 @@ class UploadImage extends Component {
                                                 <TableCell align='center'>
                                                     <FormControl>
                                                         <RadioGroup name='cardiomegaly' onChange={e => this.feedbackChangeHandler(e)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes'/>
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No'/>
+                                                            <FormControlLabel control={<Radio />} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio />} label='No' value='No' />
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     <FormControl>
                                                         <RadioGroup name='edema' onChange={e => this.feedbackChangeHandler(e)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                            <FormControlLabel control={<Radio />} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio />} label='No' value='No' />
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     <FormControl>
                                                         <RadioGroup name='consolidation' onChange={e => this.feedbackChangeHandler(e)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                            <FormControlLabel control={<Radio />} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio />} label='No' value='No' />
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     <FormControl>
                                                         <RadioGroup name='atelectasis' onChange={e => this.feedbackChangeHandler(e)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                            <FormControlLabel control={<Radio />} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio />} label='No' value='No' />
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     <FormControl>
                                                         <RadioGroup name='pleural_effusion' onChange={e => this.feedbackChangeHandler(e)}>
-                                                            <FormControlLabel control={<Radio/>} label='Yes' value='Yes' />
-                                                            <FormControlLabel control={<Radio/>} label='No' value='No' />
+                                                            <FormControlLabel control={<Radio />} label='Yes' value='Yes' />
+                                                            <FormControlLabel control={<Radio />} label='No' value='No' />
                                                         </RadioGroup>
                                                     </FormControl>
                                                 </TableCell>
@@ -370,7 +437,7 @@ class UploadImage extends Component {
     }
 
     feedbackChangeHandler = (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         this.setState({
             feedback: {
                 ...this.state.feedback,
@@ -393,8 +460,8 @@ class UploadImage extends Component {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(response =>{
-            if(response.status === 200) {
+        }).then(response => {
+            if (response.status === 200) {
                 this.setState({
                     loading: false,
                     feedbackSubmitted: true,
@@ -437,7 +504,7 @@ class UploadImage extends Component {
                         <Typography variant="h4">
                             You have reached max limit. Please contact admin
                         </Typography>
-                        <br/>
+                        <br />
                         <Button onClick={this.goHome}>
                             Home
                         </Button>
@@ -447,7 +514,7 @@ class UploadImage extends Component {
                 return this.uploadImage();
             }
         } else {
-            return <History/>
+            return <History />
         }
 
     }

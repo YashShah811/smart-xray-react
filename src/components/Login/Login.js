@@ -61,7 +61,6 @@ class Login extends Component {
         .then(response => {
             if(response.status === 200) {
                 this.props.loginAction(true)
-                sessionStorage.setItem('Login', this.props.login.login)
             }
             return response.json()
         }).then(responseJson => {
@@ -74,6 +73,7 @@ class Login extends Component {
             }else {
                 this.props.userAction(responseJson.data.id)
                 this.props.userNameAction(responseJson.data.username)
+                sessionStorage.setItem('Login', this.props.login.login)
                 sessionStorage.setItem('UserId', responseJson.data.id)
                 sessionStorage.setItem('UserName', responseJson.data.username)
                 this.setState({
