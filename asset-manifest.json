@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/smart-xray-react/static/css/main.3b05e813.chunk.css",
+    "main.js": "/smart-xray-react/static/js/main.129808d2.chunk.js",
+    "main.js.map": "/smart-xray-react/static/js/main.129808d2.chunk.js.map",
+    "runtime-main.js": "/smart-xray-react/static/js/runtime-main.310eaa59.js",
+    "runtime-main.js.map": "/smart-xray-react/static/js/runtime-main.310eaa59.js.map",
+    "static/js/2.9c9c301b.chunk.js": "/smart-xray-react/static/js/2.9c9c301b.chunk.js",
+    "static/js/2.9c9c301b.chunk.js.map": "/smart-xray-react/static/js/2.9c9c301b.chunk.js.map",
+    "index.html": "/smart-xray-react/index.html",
+    "precache-manifest.774a33f16583778ab13f8398cfed75c3.js": "/smart-xray-react/precache-manifest.774a33f16583778ab13f8398cfed75c3.js",
+    "service-worker.js": "/smart-xray-react/service-worker.js",
+    "static/css/main.3b05e813.chunk.css.map": "/smart-xray-react/static/css/main.3b05e813.chunk.css.map",
+    "static/js/2.9c9c301b.chunk.js.LICENSE.txt": "/smart-xray-react/static/js/2.9c9c301b.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.310eaa59.js",
+    "static/js/2.9c9c301b.chunk.js",
+    "static/css/main.3b05e813.chunk.css",
+    "static/js/main.129808d2.chunk.js"
+  ]
+}
