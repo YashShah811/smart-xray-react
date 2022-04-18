@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/smart-xray-react/static/css/main.3b05e813.chunk.css",
-    "main.js": "/smart-xray-react/static/js/main.af6ae7d4.chunk.js",
-    "main.js.map": "/smart-xray-react/static/js/main.af6ae7d4.chunk.js.map",
+    "main.js": "/smart-xray-react/static/js/main.47868117.chunk.js",
+    "main.js.map": "/smart-xray-react/static/js/main.47868117.chunk.js.map",
     "runtime-main.js": "/smart-xray-react/static/js/runtime-main.310eaa59.js",
     "runtime-main.js.map": "/smart-xray-react/static/js/runtime-main.310eaa59.js.map",
     "static/js/2.9c9c301b.chunk.js": "/smart-xray-react/static/js/2.9c9c301b.chunk.js",
     "static/js/2.9c9c301b.chunk.js.map": "/smart-xray-react/static/js/2.9c9c301b.chunk.js.map",
     "index.html": "/smart-xray-react/index.html",
-    "precache-manifest.ec9233cdfa7aab1a93e8cbc1958bfff6.js": "/smart-xray-react/precache-manifest.ec9233cdfa7aab1a93e8cbc1958bfff6.js",
+    "precache-manifest.f7237855399b1fdefbae43c09bdc66b4.js": "/smart-xray-react/precache-manifest.f7237855399b1fdefbae43c09bdc66b4.js",
     "service-worker.js": "/smart-xray-react/service-worker.js",
     "static/css/main.3b05e813.chunk.css.map": "/smart-xray-react/static/css/main.3b05e813.chunk.css.map",
     "static/js/2.9c9c301b.chunk.js.LICENSE.txt": "/smart-xray-react/static/js/2.9c9c301b.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.310eaa59.js",
     "static/js/2.9c9c301b.chunk.js",
     "static/css/main.3b05e813.chunk.css",
-    "static/js/main.af6ae7d4.chunk.js"
+    "static/js/main.47868117.chunk.js"
   ]
 }

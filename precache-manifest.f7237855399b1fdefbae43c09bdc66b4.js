@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "5c9388b2b79050a28968b2a2296854db",
+    "revision": "5cbeb01856250185ef2523d002492eb2",
     "url": "/smart-xray-react/index.html"
   },
   {
-    "revision": "4e48f67dd02ac6bf5ec2",
+    "revision": "cc51f223a9409d27cef0",
     "url": "/smart-xray-react/static/css/main.3b05e813.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/smart-xray-react/static/js/2.9c9c301b.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "4e48f67dd02ac6bf5ec2",
-    "url": "/smart-xray-react/static/js/main.af6ae7d4.chunk.js"
+    "revision": "cc51f223a9409d27cef0",
+    "url": "/smart-xray-react/static/js/main.47868117.chunk.js"
   },
   {
     "revision": "814c83a533d003374270",

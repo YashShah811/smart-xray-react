@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/smart-xray-react/precache-manifest.ec9233cdfa7aab1a93e8cbc1958bfff6.js"
+  "/smart-xray-react/precache-manifest.f7237855399b1fdefbae43c09bdc66b4.js"
 );
 
 self.addEventListener('message', (event) => {
