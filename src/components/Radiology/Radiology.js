@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import './UploadImage.css';
+import fs, { stat } from 'fs';
+import './Radiology.css';
 import History from '../History/History';
 import { connect } from 'react-redux';
 import { server } from '../../properties';
@@ -20,6 +21,8 @@ import { history, result, login, userId, userName } from "../../redux/action";
 import { threshold } from '../../constants/threshold';
 import { ContactsOutlined, PhotoCamera } from '@material-ui/icons';
 import { styled } from '@material-ui/styles';
+import { Document, Page } from 'react-pdf';
+import Header from '../Header/Header';
 
 const Input = styled('input')({
     display: 'none',
@@ -35,181 +38,105 @@ const styles = theme => ({
     },
 })
 
-class UploadImage extends Component {
+class Radiology extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            selectedXrayFile: null,
-            selectedReportFile: null,
             responseData: null,
             loading: true,
-            xrayPreview: null,
-            xrayFileName: null,
-            reportPreview: null,
-            reportFileName: null,
-            limit: false,
-            invalidFile: null,
             open: false,
             alertMessage: '',
-            isFeedbackSet: false,
-            feedback: {
-                cardiomegaly: null,
-                edema: null,
-                consolidation: null,
-                atelectasis: null,
-                pleural_effusion: null
-            },
-            feedbackSubmitted: false,
             inputSelection: 0,
+            pageNumber: null,
+            data: [],
+            index: 0
         }
     }
 
     componentDidMount() {
-        console.log(sessionStorage)
-        if(sessionStorage.getItem('Login') && sessionStorage.getItem('is_radiologist') === '1') {
-            console.log('Inside...')
-            window.location.replace('/#/radiology')
-        } else {
-            this.setState({
-                loading: false
+        this.props.historyAction(false)
+        fetch(server + "/userInput/" + sessionStorage.getItem('UserId'), {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Accept": "application/form-data",
+                "Access-Control-Allow-Origin": "*",
+                "x-access-token": sessionStorage.getItem('access_token'),
+                "x-refresh-token": sessionStorage.getItem('refresh_token')
+            },
+        }).then(response => {
+            if (response.status === 401) {
+                sessionStorage.clear();
+                this.props.loginAction(false);
+                window.location.replace('/')
+            }
+            return response.json()
+        })
+            .then(responseJson => {
+                console.log(responseJson)
+                if (responseJson.access_token) {
+                    sessionStorage.setItem('access_token', responseJson.access_token)
+                }
+                sessionStorage.setItem('Login', true)
+                this.setState({
+                    data: responseJson,
+                    loading: false
+                })
             })
-        }
     }
 
-    onChangeHandlerXray = event => {
-        var reader = new FileReader();
-        const file = event.target.files[0];
-        this.setState({
-            selectedXrayFile: null,
-            xrayPreview: null,
-            xrayFileName: null
-        })
-        if (file) {
-            const fileName = event.target.files[0].name;
-            console.log(fileName)
-            const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-            if (extension === 'dcm' || extension === 'DCM' || extension === 'jpg' || extension === 'JPG' || extension === 'raw' || extension === 'RAW' || extension === 'jpeg' || extension === 'JPEG') {
-                reader.onloadend = () => {
-                    this.setState({
-                        invalidFile: false,
-                        selectedXrayFile: file,
-                        xrayPreview: reader.result,
-                        xrayFileName: fileName
-                    })
-                }
-                reader.readAsDataURL(file)
-            } else {
-                this.setState({
-                    invalidFile: true,
-                    open: true,
-                    alertMessage: 'Please upload valid xray'
-                })
-
-            }
-        }
-        console.log(this.state)
-    }
-
-    onChangeHandlerReport = event => {
-        var reader = new FileReader();
-        const file = event.target.files[0];
-        this.setState({
-            selectedReportFile: null,
-            reportPreview: null,
-            reportFileName: null
-        })
-        if (file) {
-            const fileName = event.target.files[0].name;
-            console.log(fileName)
-            const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-            if (extension === 'pdf' || extension === 'PDF') {
-                reader.onloadend = () => {
-                    this.setState({
-                        invalidFile: false,
-                        selectedReportFile: file,
-                        reportPreview: reader.result,
-                        reportFileName: fileName
-                    })
-                }
-                reader.readAsDataURL(file)
-            } else {
-                this.setState({
-                    open: true,
-                    alertMessage: 'Please upload valid report',
-                    invalidFile: true
-                })
-            }
-        }
-    }
-
-    calculate = () => {
-        console.log('State: ', this.state)
+    calculate = (userAccessId) => {
         this.setState({
             loading: true
         })
-        if (this.state.selectedFile === null) {
-            alert("Please select file.")
-            this.setState({
-                loading: false,
-                open: true,
-                alertMessage: 'Please select file.'
-            })
-        } else {
-            var files = {
-                xray: this.state.selectedXrayFile,
-                report: this.state.selectedReportFile
+        fetch(server + "/userInput", {
+            method: 'PUT',
+            mode: 'cors',
+            body: JSON.stringify({
+                cardiomegaly: this.state.cardiomegaly,
+                edema: this.state.edema,
+                consolidation: this.state.consolidation,
+                atelectasis: this.state.atelectasis,
+                pleural_effusion: this.state.pleural_effusion,
+                active_tuberculosis: this.state.active_tuberculosis,
+                healed_tuberculosis: this.state.healed_tuberculosis,
+                metastasis: this.state.metastasis,
+                mass_lesion: this.state.mass_lesion,
+                calcification: this.state.calcification,
+                none: this.state.none,
+                userAccessId: userAccessId,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                "x-access-token": sessionStorage.getItem('access_token'),
+                "x-refresh-token": sessionStorage.getItem('refresh_token')
+            },
+        }).then(response => {
+            if (response.status === 401) {
+                sessionStorage.clear();
+                this.props.loginAction(false);
+                window.location.replace('/')
             }
-            let data = new FormData();
-            data.append('xray', files.xray)
-            data.append('report', files.report)
-            data.append('cardiomegaly', this.state.cardiomegaly)
-            data.append('edema', this.state.edema)
-            data.append('consolidation', this.state.consolidation)
-            data.append('atelectasis', this.state.atelectasis)
-            data.append('pleural_effusion', this.state.pleural_effusion)
-            data.append('active_tuberculosis', this.state.active_tuberculosis)
-            data.append('healed_tuberculosis', this.state.healed_tuberculosis)
-            data.append('metastasis', this.state.metastasis)
-            data.append('mass_lesion', this.state.mass_lesion)
-            data.append('calcification', this.state.calcification)
-            data.append('none', this.state.none)
-
-            fetch(server + "/calculate/" + sessionStorage.getItem('UserId'), {
-                method: 'POST',
-                mode: 'cors',
-                body: data,
-                headers: {
-                    "Accept": "application/form-data",
-                    "Access-Control-Allow-Origin": "*",
-                    "x-access-token": sessionStorage.getItem('access_token'),
-                    "x-refresh-token": sessionStorage.getItem('refresh_token')
-                },
-            }).then(response => {
-                if (response.status === 401) {
-                    sessionStorage.clear();
-                    this.props.loginAction(false);
-                    window.location.replace('/')
+            return response.json()
+        })
+            .then(responseJson => {
+                console.log(responseJson)
+                if (responseJson.access_token) {
+                    sessionStorage.setItem('access_token', responseJson.access_token)
                 }
-                return response.json()
-            }).then(responseJson => {
-                if (responseJson.data === null) {
+                if (responseJson.status === 500) {
                     this.setState({
                         loading: false,
-                        limit: true
+                        open: true,
+                        alertMessage: 'Something went wrong, please contact system admin'
                     })
                 } else {
                     this.setState({
                         loading: false,
-                        responseData: responseJson.data,
-                        xrayPreview: null,
-                        selectedXrayFile: null,
-                        xrayFileName: null,
-                        reportPreview: null,
-                        selectedReportFile: null,
-                        reportFileName: null,
                         open: true,
-                        alertMessage: 'File submitted successfully',
+                        alertMessage: 'Response submitted successfully',
+                        index: this.state.index + 1,
                         inputSelection: 0,
                         cardiomegaly: undefined,
                         edema: undefined,
@@ -223,129 +150,122 @@ class UploadImage extends Component {
                         calcification: undefined,
                         none: undefined
                     })
-                    // this.props.resultAction(true)
+                    console.log(this.state)
                 }
             })
-                .catch(error => console.log(error))
-        }
+            .catch(error => console.log(error))
     }
 
-    uploadImage = () => {
+    radiology = () => {
+        var { data, index } = this.state
+        while (index < data.length) {
+            var x = data[index];
+            var xhr = new XMLHttpRequest();
+            xhr.open('HEAD', server + '/' + x.image_path.split('.')[0] + '.' + x.image_path.split('.')[1], false);
+            xhr.send();
+            if (xhr.status == "404") {
+                // console.log('File not exist')
+                index++
+                continue;
+            } else {
+                return (
+                    <div style={{ flexGrow: 1, padding: '3%', margin: '3%' }}>
+                        <Grid container item direction='column' sm wrap='wrap' alignItems='center' alignContent='center' justify='center' spacing={2} >
+                            <Grid container item sm direction='row' justify='center' alignItems='center' wrap='wrap'>
+                                <Grid container item sm direction='column' justify='center' alignItems='center' wrap='wrap'>
+
+                                    <img
+                                        id="target"
+                                        src={server + '/' + x.processed_image_path}
+                                        style={{ maxWidth: '100%' }}
+                                        alt='image'
+                                    />
+                                </Grid>
+                                <Grid container item sm direction='column' justify='center' alignItems='center' wrap='wrap'>
+                                    {x.report_path === null ?
+                                        <Typography variant='h6'> No report available </Typography> :
+                                        <a href={server + '/' + x.report_path} target="_blank">Report</a>}
+                                </Grid>
+                                <Grid container item direction='column' justify='flex-start' alignItems='stretch' sm wrap='wrap'>
+                                    <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap'>
+                                        <Typography variant='h4' >Level 1 Input</Typography><br />
+                                    </Grid>
+                                    <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap' style={{ marginLeft: '5%' }}>
+                                        <FormGroup>
+                                            <FormControlLabel control={<Radio color='primary' name='cardiomegaly' checked={x.cardiomegaly === 1} disabled />} label="Cardiomegaly" />
+                                            <FormControlLabel control={<Radio color='primary' name='edema' checked={x.edema === 1} disabled />} label="Edema" />
+                                            <FormControlLabel control={<Radio color='primary' name='consolidation' checked={x.consolidation === 1} disabled />} label="Consolidation" />
+                                            <FormControlLabel control={<Radio color='primary' name='atelectasis' checked={x.atelectasis === 1} disabled />} label="Atelectasis" />
+                                            <FormControlLabel control={<Radio color='primary' name='pleural_effusion' checked={x.pleural_effusion === 1} disabled />} label="Pleural Effusion" />
+                                            <FormControlLabel control={<Radio color='primary' name='active_tuberculosis' checked={x.active_tuberculosis === 1} disabled />} label="Active Tuberculosis" />
+                                            <FormControlLabel control={<Radio color='primary' name='healed_tuberculosis' checked={x.healed_tuberculosis === 1} disabled />} label="Healed Tuberculosis" />
+                                            <FormControlLabel control={<Radio color='primary' name='metastasis' checked={x.metastasis === 1} disabled />} label="Metastasis" />
+                                            <FormControlLabel control={<Radio color='primary' name='mass_lesion' checked={x.mass_lesion === 1} disabled />} label="Mass Lesion" />
+                                            <FormControlLabel control={<Radio color='primary' name='calcification' checked={x.calcification === 1} disabled />} label="Calcification" />
+                                        </FormGroup>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item sm direction='column' wrap='wrap'>
+                                <Grid container item direction='row' justify='center' alignItems='baseline' sm wrap='wrap'>
+                                    <Grid container item direction='column' justify='flex-start' alignItems='stretch' sm wrap='wrap'>
+                                        <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap'>
+                                            <Typography variant='h4' >Please select the condition(s) for the uploaded X-Ray</Typography><br />
+                                        </Grid>
+                                        <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap'>
+                                            <FormGroup>
+                                                <FormControlLabel control={<Checkbox color='primary' name='cardiomegaly' onChange={this.onChange} />} label="Cardiomegaly" />
+                                                <FormControlLabel control={<Checkbox color='primary' name='edema' onChange={this.onChange} />} label="Edema" />
+                                                <FormControlLabel control={<Checkbox color='primary' name='consolidation' onChange={this.onChange} />} label="Consolidation" />
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <FormControlLabel control={<Checkbox color='primary' name='atelectasis' onChange={this.onChange} />} label="Atelectasis" />
+                                                <FormControlLabel control={<Checkbox color='primary' name='pleural_effusion' onChange={this.onChange} />} label="Pleural Effusion" />
+                                                <FormControlLabel control={<Checkbox color='primary' name='active_tuberculosis' onChange={this.onChange} />} label="Active Tuberculosis" />
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <FormControlLabel control={<Checkbox color='primary' name='healed_tuberculosis' onChange={this.onChange} />} label="Healed Tuberculosis" />
+                                                <FormControlLabel control={<Checkbox color='primary' name='metastasis' onChange={this.onChange} />} label="Metastasis" />
+                                                <FormControlLabel control={<Checkbox color='primary' name='mass_lesion' onChange={this.onChange} />} label="Mass Lesion" />
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <FormControlLabel control={<Checkbox color='primary' name='calcification' onChange={this.onChange} />} label="Calcification" />
+                                                <FormControlLabel control={<Checkbox color='primary' name='none' onChange={this.onChange} />} label="None" />
+                                            </FormGroup>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap'>
+                                    <Button
+                                        type="submit"
+                                        disabled={this.state.inputSelection == 0}
+                                        onClick={() => {
+                                            this.calculate(x.id)
+                                            index++
+                                        }}
+                                        variant='contained'
+                                        style={{ marginRight: '2.5%', marginTop: '1%' }}
+                                    >
+                                        Submit
+                                    </Button>
+                                    <Button type='reset' onClick={this.goHome} variant='contained' style={{ marginLeft: '2.5%', marginTop: '1%' }}>
+                                        Cancel
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            {this.alert()}
+                        </Grid>
+                    </div>
+                )
+            }
+        }
         return (
             <div style={{ flexGrow: 1, padding: '3%', margin: '3%' }}>
-                <Grid container item direction='row' sm wrap='wrap' alignItems='center' alignContent='center' justify='center' spacing={2} >
-                    <Grid container item sm={3} direction='column' justify='center' alignItems='center' wrap='wrap'>
-                        <Grid container item sm direction='column' justify='center' alignItems='center' wrap='wrap'>
-                            <Typography style={{ padding: '5px 10px' }} variant='h4'>Instructions</Typography>
-                            <Typography style={{ padding: '2px' }}>Sample xray</Typography>
-                            <img
-                                id="target"
-                                src={server + '/sample.jpg'}
-                                style={{ maxWidth: '100%' }}
-                                alt='sample image'
-                            />
-                            <br />
-                            <ul>
-                                <li>Only raw files are valid for xray</li>
-                                <li>Only pdf files are valid for report</li>
-                                <li>Please upload properly cropped and aligned image<br />(Refer to the sample xray)</li>
-                                <li>Please upload only black and white xray image</li>
-                                <li>Only chest xrays are supported</li>
-                            </ul>
-                        </Grid>
-                    </Grid>
-                    <Grid container item sm direction='column' wrap='wrap'>
-                        <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
-
-                            <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap'>
-                                <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
-                                    {/* <Typography style={{ padding: '5px 10px', marginTop: '-10%', marginBottom: '15%' }} variant='h4'>2. Upload</Typography> */}
-                                    <label htmlFor='upload-button-xray'>
-                                        <Input
-                                            color='primary'
-                                            id='upload-button-xray'
-                                            type='file'
-                                            onChange={this.onChangeHandlerXray}
-                                        />
-                                        <Button variant="contained" endIcon={<PhotoCamera />} component='span'>
-                                            Upload Raw File
-                                        </Button>
-                                    </label>
-                                    <img
-                                        id="target-xray"
-                                        src={this.state.xrayPreview}
-                                        style={{ maxWidth: 320, maxHeight: 320 }}
-                                        alt={this.state.xrayFileName}
-                                    />
-                                </Grid>
-                                <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
-                                    {/* <Typography style={{ padding: '5px 10px', marginTop: '-10%', marginBottom: '15%' }} variant='h4'>2. Upload</Typography> */}
-
-                                    <label htmlFor='upload-button-report'>
-                                        <Input
-                                            color='primary'
-                                            id='upload-button-report'
-                                            type='file'
-                                            onChange={this.onChangeHandlerReport}
-                                        />
-                                        <Button variant="contained" endIcon={<PhotoCamera />} component='span'>
-                                            Report
-                                        </Button>
-                                    </label>
-                                    <img
-                                        id="target-report"
-                                        src={this.state.reportPreview}
-                                        style={{ maxWidth: 320, maxHeight: 320 }}
-                                        alt={this.state.reportFileName}
-                                    />
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        {/* <Grid container item sm direction='column' wrap='wrap'> */}
-                        <Grid container item direction='row' justify='center' alignItems='baseline' sm wrap='wrap' style={{ marginTop: '5%' }}>
-                            <Grid container item direction='column' justify='flex-start' alignItems='stretch' sm wrap='wrap'>
-                                <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap'>
-                                    <Typography variant='h4' >Please select the condition(s) for the uploaded X-Ray</Typography><br />
-                                </Grid>
-                                <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap'>
-                                    <FormGroup>
-                                        <FormControlLabel control={<Checkbox color='primary' name='cardiomegaly' onChange={this.onChange} />} label="Cardiomegaly" />
-                                        <FormControlLabel control={<Checkbox color='primary' name='edema' onChange={this.onChange} />} label="Edema" />
-                                        <FormControlLabel control={<Checkbox color='primary' name='consolidation' onChange={this.onChange} />} label="Consolidation" />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <FormControlLabel control={<Checkbox color='primary' name='atelectasis' onChange={this.onChange} />} label="Atelectasis" />
-                                        <FormControlLabel control={<Checkbox color='primary' name='pleural_effusion' onChange={this.onChange} />} label="Pleural Effusion" />
-                                        <FormControlLabel control={<Checkbox color='primary' name='active_tuberculosis' onChange={this.onChange} />} label="Active Tuberculosis" />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <FormControlLabel control={<Checkbox color='primary' name='healed_tuberculosis' onChange={this.onChange} />} label="Healed Tuberculosis" />
-                                        <FormControlLabel control={<Checkbox color='primary' name='metastasis' onChange={this.onChange} />} label="Metastasis" />
-                                        <FormControlLabel control={<Checkbox color='primary' name='mass_lesion' onChange={this.onChange} />} label="Mass Lesion" />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <FormControlLabel control={<Checkbox color='primary' name='calcification' onChange={this.onChange} />} label="Calcification" />
-                                        <FormControlLabel control={<Checkbox color='primary' name='none' onChange={this.onChange} />} label="None" />
-                                    </FormGroup>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        <Grid container item direction='row' justify='center' alignItems='baseline' sm wrap='wrap'>
-                            <Button
-                                type="submit"
-                                disabled={this.state.invalidFile || this.state.selectedXrayFile === null || this.state.inputSelection === 0}
-                                onClick={this.calculate}
-                                variant='contained'
-                                style={{ marginRight: '5%', marginTop: '7.5%' }}
-                            >
-                                Submit
-                            </Button>
-                            <Button type='reset' onClick={this.goHome} variant='contained'>
-                                Cancel
-                            </Button>
-                        </Grid>
-                    </Grid>
-                    {this.alert()}
+                <Grid container item direction='column' sm wrap='wrap' alignItems='center' alignContent='center' justify='center' spacing={2} >
+                    <Typography variant='h3'>
+                        Nothing to show
+                    </Typography>
                 </Grid>
             </div>
         )
@@ -378,7 +298,7 @@ class UploadImage extends Component {
         />
     )
 
-    result = () => {
+    /* result = () => {
         if (this.state.responseData.isError === 'true' && this.state.responseData.message == 'Raising error: unwantedImage') {
             return (
                 <Dialog
@@ -561,7 +481,7 @@ class UploadImage extends Component {
             return this.alert();
         }
     }
-
+    
     feedbackChangeHandler = (e) => {
         const { name, value } = e.target;
         this.setState({
@@ -571,7 +491,7 @@ class UploadImage extends Component {
             }
         })
     }
-
+    
     submitFeedback = () => {
         this.props.resultAction(false)
         this.setState({
@@ -610,9 +530,9 @@ class UploadImage extends Component {
                 })
             }
         })
-    }
+    } */
 
-    render() {
+    /* render() {
         if (!this.props.history.history) {
             if (this.state.loading) {
                 return (
@@ -637,12 +557,26 @@ class UploadImage extends Component {
                     </Grid>
                 )
             } else {
-                return this.uploadImage();
+                return this.radiology();
             }
         } else {
             return <History />
         }
+    
+    } */
 
+    render() {
+        if (this.state.loading) {
+            return (
+                <Grid container item justify='center' alignItems='center' style={{ minHeight: '80vh' }}>
+                    <CircularProgress
+                        disableShrink
+                    />
+                </Grid>
+            )
+        } else {
+            return this.radiology();
+        }
     }
 }
 
@@ -655,6 +589,9 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     loginAction: status => { dispatch(login(status)) },
+    historyAction: status => {
+        dispatch(history(status))
+    },
     userAction: id => { dispatch(userId(id)) },
     userNameAction: name => { dispatch(userName(name)) },
     resultAction: status => {
@@ -662,4 +599,4 @@ const mapDispatchToProps = dispatch => ({
     }
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UploadImage));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Radiology));

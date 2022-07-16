@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux'
 import { store } from './redux/store';
+import { HashRouter as Router, Switch, Route, Link, Routes } from 'react-router-dom';
+import Radiology from './components/Radiology/Radiology';
+import Header from './components/Header/Header';
+import History from './components/History/History';
+import Signup from './components/Signup/Signup';
 
 ReactDOM.render(
     <Provider store={store}>
-        <App />
-    </Provider>, 
+        <Router>
+            <Routes>
+                <Route path='/' element={<App />} />
+                <Route path='/radiology' element={<Fragment><Header /> <Radiology /></Fragment>} />
+                <Route path='/history' element={<Fragment><Header /> <History /></Fragment>} />
+                <Route path='/signup' element={<Fragment><Header /> <Signup /></Fragment>} />
+            </Routes>
+        </Router>
+        {/* <App /> */}
+    </Provider>,
     document.getElementById('root')
 );
 
