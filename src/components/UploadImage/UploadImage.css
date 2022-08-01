@@ -1,0 +1,51 @@
+.uploadImage {
+    padding: 2%;
+}
+
+input[type="file"] {
+    padding: 10px;
+}
+
+.submitButton {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    font-size: 16px;
+    margin: 10px;
+}
+
+.result {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.result > div {
+    margin: 5px;
+}
+
+.response {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    background-color: aliceblue;
+    border: 1px solid black;
+    color: black;
+    margin-top: 10%;
+    padding: 2%;
+}
+
+.image {
+    display: flex;
+    align-self: center;
+}
+
+.response1 {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    background-color: aliceblue;
+    margin: 2%;
+}
