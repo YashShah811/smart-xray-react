@@ -3,7 +3,7 @@ import { Component } from 'react';
 import './History.css';
 import UploadImage from '../UploadImage/UploadImage';
 import { connect } from 'react-redux';
-import {login, history, result} from '../../redux/action';
+import { login, history, result } from '../../redux/action';
 import { server } from '../../properties';
 import { XAxis, YAxis, Bar, Legend, Line, ComposedChart, Cell } from 'recharts';
 import {
@@ -17,7 +17,7 @@ import {
     Radio,
     RadioGroup,
     Table,
-    CircularProgress, Snackbar, FormControl, FormGroup
+    CircularProgress, Snackbar, FormControl, FormGroup, Button, Checkbox
 } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
 import { Tooltip } from 'recharts';
@@ -57,11 +57,18 @@ class History extends Component {
             open: false,
             message: '',
             page: 1,
-            content: null
+            content: null,
+            isUpdate: false,
+            inputSelection: 0,
+            config: [],
         }
     }
 
     componentDidMount() {
+        this.getData();
+    }
+
+    getData = () => {
         this.setState({ loading: true })
         fetch(server + '/history', {
             method: 'GET',
@@ -70,29 +77,87 @@ class History extends Component {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
-                "x-access-token": sessionStorage.getItem('access_token'),
-                "x-refresh-token": sessionStorage.getItem('refresh_token')
+                // "x-access-token": sessionStorage.getItem('access_token'),
+                // "x-refresh-token": sessionStorage.getItem('refresh_token')
             }
         }).then(respose => {
-            if(respose.status === 401) {
+            if (respose.status === 401) {
                 sessionStorage.clear();
                 this.props.loginAction(false);
                 window.location.replace('/')
-            } else if(respose.status === 200) {
+            } else if (respose.status === 200) {
                 this.props.historyAction(true);
-            }   
+            }
             return respose.json()
         })
             .then(responseJson => {
-                console.log(responseJson.data)
-                if(responseJson.data.access_token) {
-                    sessionStorage.setItem('access_token', responseJson.data.access_token)
+                console.log(responseJson)
+                if (responseJson.accessToken) {
+                    console.log('token: ', responseJson.accessToken)
+                    // sessionStorage.setItem('access_token', responseJson.accessToken)
                 }
                 this.setState({
+                    config: responseJson.configuration,
                     data: responseJson.data,
-                    loading: false
+                    loading: false,
+                    isUpdate: false
                 })
             }).catch(e => console.log(e))
+    }
+
+
+    calculate = (userAccessId) => {
+        this.setState({
+            loading: true
+        })
+        fetch(server + "/userInput", {
+            method: 'PUT',
+            mode: 'cors',
+            body: JSON.stringify({
+                cardiomegaly: this.state.cardiomegaly,
+                edema: this.state.edema,
+                consolidation: this.state.consolidation,
+                atelectasis: this.state.atelectasis,
+                pleural_effusion: this.state.pleural_effusion,
+                active_tuberculosis: this.state.active_tuberculosis,
+                healed_tuberculosis: this.state.healed_tuberculosis,
+                metastasis: this.state.metastasis,
+                mass_lesion: this.state.mass_lesion,
+                calcification: this.state.calcification,
+                none: this.state.none,
+                userAccessId: userAccessId,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                "x-access-token": sessionStorage.getItem('access_token'),
+                "x-refresh-token": sessionStorage.getItem('refresh_token')
+            },
+        }).then(response => {
+            if (response.status === 401) {
+                sessionStorage.clear();
+                this.props.loginAction(false);
+                window.location.replace('/')
+            }
+            return response.json()
+        })
+            .then(responseJson => {
+                console.log(responseJson)
+                if (responseJson.access_token) {
+                    sessionStorage.setItem('access_token', responseJson.access_token)
+                }
+                if (responseJson.status === 500) {
+                    this.setState({
+                        loading: false,
+                        open: true,
+                        alertMessage: 'Something went wrong, please contact system admin',
+                        isUpdate: false
+                    })
+                } else {
+                    this.getData()
+                    console.log(this.state)
+                }
+            })
+            .catch(error => console.log(error))
     }
 
     history = () => {
@@ -153,8 +218,8 @@ class History extends Component {
                                     width={1000}
                                     height={600}
                                     data={chartData}>
-                                    <XAxis tick={false} dataKey='name'/>
-                                    <YAxis interval="preserveStartEnd" domain={[0,100]}/>
+                                    <XAxis tick={false} dataKey='name' />
+                                    <YAxis interval="preserveStartEnd" domain={[0, 100]} />
                                     <Tooltip />
                                     <Legend align='right' layout='vertical' verticalAlign='middle' content={() => (
                                         <ul>
@@ -265,17 +330,90 @@ class History extends Component {
                                 </Table>
                             </Grid>
                         </Grid>
+                        {this.state.config[0].allow_radiologist_reassess === '1' ? (this.state.isUpdate ?
+                            <Grid container item direction='row' justify='center' alignItems='center' wrap='wrap'>
+                                <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
+                                    <Table style={{ border: '2px solid black' }}>
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell align='center'></TableCell>
+                                                <TableCell align='center'>Cardiomegaly</TableCell>
+                                                <TableCell align='center'>Edema</TableCell>
+                                                <TableCell align='center'>Consolidation</TableCell>
+                                                <TableCell align='center'>Atelectasis</TableCell>
+                                                <TableCell align='center'>Pleural effusion</TableCell>
+                                                <TableCell align='center'>Active Tuberculosis</TableCell>
+                                                <TableCell align='center'>Healed Tuberculosis</TableCell>
+                                                <TableCell align='center'>Metastasis</TableCell>
+                                                <TableCell align='center'>Mass Lesion</TableCell>
+                                                <TableCell align='center'>Calcification</TableCell>
+                                                <TableCell align='center'>None</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Update 2<sup>nd</sup> Level Input</TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='cardiomegaly' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='edema' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='consolidation' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='atelectasis' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='pleural_effusion' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='active_tuberculosis' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='healed_tuberculosis' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='metastasis' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='mass_lesion' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='calcification' onChange={this.onChange} />} />
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    <FormControlLabel control={<Checkbox color='primary' name='none' onChange={this.onChange} />} />
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                    <Grid container item direction='row' justify='center' alignItems='center' sm wrap='wrap'>
+                                        <Button onClick={() => this.calculate(sessionStorage.getItem('UserId'))}> Save </Button>
+                                        <Button onClick={() => { this.setState({ isUpdate: false }) }}> Cancel </Button>
+                                    </Grid>
+                                </Grid>
+                            </Grid> :
+                            <Grid container item direction='row' justify='center' alignItems='center' wrap='wrap'>
+                                <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
+                                    <Button shape='rounded' variant='outlined' size='large' onClick={() => {
+                                        this.setState({
+                                            isUpdate: true,
+                                        })
+                                    }} >
+                                        Update Input
+                                    </Button>
+                                </Grid>
+                            </Grid>) : null}
+
                         <Grid container item direction='row' justify='center' alignItems='center' wrap='wrap'>
                             <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
                                 <Pagination shape='rounded' variant='outlined' size='large' count={data.length} page={page} onChange={(event, value) => {
                                     this.setState({
                                         page: value,
-                                        content: data[value - 1]
                                     })
                                 }} />
                             </Grid>
                         </Grid>
-
                     </Grid>
                 </div>
             )
@@ -291,6 +429,14 @@ class History extends Component {
             message={this.state.message}
         />
     )
+
+    onChange = (event) => {
+        this.setState({
+            ...this.state,
+            [event.target.name]: event.target.checked,
+            inputSelection: event.target.checked === true ? this.state.inputSelection + 1 : (this.state.inputSelection === 0 ? 0 : this.state.inputSelection - 1)
+        })
+    }
 
     feedbackChangeHandler = (e, id) => {
         const { name, value } = e.target;

@@ -75,12 +75,12 @@ class Login extends Component {
                 } else {
                     this.props.userAction(responseJson.data.id)
                     this.props.userNameAction(responseJson.data.username)
-                    sessionStorage.setItem('access_token', responseJson.data.access_token)
-                    sessionStorage.setItem('refresh_token', responseJson.data.refresh_token)
+                    // sessionStorage.setItem('access_token', responseJson.data.access_token)
+                    // sessionStorage.setItem('refresh_token', responseJson.data.refresh_token)
                     sessionStorage.setItem('Login', this.props.login.login)
                     sessionStorage.setItem('UserId', responseJson.data.id)
                     sessionStorage.setItem('UserName', responseJson.data.username)
-                    sessionStorage.setItem('is_radiologist', responseJson.data.is_radiologist)
+                    // sessionStorage.setItem('is_radiologist', responseJson.data.is_radiologist)
                     this.setState({
                         loading: false
                     })
@@ -115,7 +115,7 @@ class Login extends Component {
                 <Button onClick={this.onSubmit} color='primary'>
                     Login
                 </Button>
-                <Typography>Don't have account? Create <a href='/#/signup'>here </a></Typography>
+                {/* <Typography>Don't have account? Create <a href='/#/signup'>here </a></Typography> */}
                 {this.alert()}
             </Grid>
         )

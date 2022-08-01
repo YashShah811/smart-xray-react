@@ -18,7 +18,7 @@ ReactDOM.render(
                 <Route path='/' element={<App />} />
                 <Route path='/radiology' element={<Fragment><Header /> <Radiology /></Fragment>} />
                 <Route path='/history' element={<Fragment><Header /> <History /></Fragment>} />
-                <Route path='/signup' element={<Fragment><Header /> <Signup /></Fragment>} />
+                {/* <Route path='/signup' element={<Fragment><Header /> <Signup /></Fragment>} /> */}
             </Routes>
         </Router>
         {/* <App /> */}

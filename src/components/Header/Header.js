@@ -50,7 +50,7 @@ class Header extends Component {
                         {this.props.login.login || sessionStorage.getItem('Login') ? 'History' : ''}
                     </Button>*/}
                         {/* {button} */}
-                        <Button color="inherit" onClick={() => {
+                        {/* <Button color="inherit" onClick={() => {
                             if (this.props.history.history) {
                                 if (sessionStorage.getItem('is_radiologist') === '1') {
                                     window.location.replace('/#/radiology')
@@ -62,9 +62,9 @@ class Header extends Component {
                             }
                         }}>
                             {this.props.login.login ? this.props.history.history ? 'Home' : 'History' : ''}
-                        </Button>
+                        </Button> */}
                         <Button color="inherit" onClick={this.logout}>
-                            {this.props.login.login /* || sessionStorage.getItem('Login') */ ? 'SIGNOUT' : ''}
+                            {this.props.login.login || sessionStorage.getItem('Login') ? 'SIGNOUT' : ''}
                         </Button>
                     </Toolbar>
                 </AppBar>

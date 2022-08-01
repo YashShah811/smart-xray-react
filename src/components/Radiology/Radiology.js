@@ -56,14 +56,14 @@ class Radiology extends Component {
 
     componentDidMount() {
         this.props.historyAction(false)
-        fetch(server + "/userInput/" + sessionStorage.getItem('UserId'), {
+        fetch(server + "/userInput" /* + sessionStorage.getItem('UserId') */, {
             method: 'GET',
             mode: 'cors',
             headers: {
                 "Accept": "application/form-data",
                 "Access-Control-Allow-Origin": "*",
-                "x-access-token": sessionStorage.getItem('access_token'),
-                "x-refresh-token": sessionStorage.getItem('refresh_token')
+                // "x-access-token": sessionStorage.getItem('access_token'),
+                // "x-refresh-token": sessionStorage.getItem('refresh_token')
             },
         }).then(response => {
             if (response.status === 401) {
