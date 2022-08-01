@@ -330,7 +330,7 @@ class History extends Component {
                                 </Table>
                             </Grid>
                         </Grid>
-                        {this.state.config[0].allow_radiologist_reassess === '1' ? (this.state.isUpdate ?
+                        {this.state.config[0].allow_radiologist_reassess === 'true' ? (this.state.isUpdate ?
                             <Grid container item direction='row' justify='center' alignItems='center' wrap='wrap'>
                                 <Grid container item direction='column' justify='center' alignItems='center' sm wrap='wrap'>
                                     <Table style={{ border: '2px solid black' }}>
