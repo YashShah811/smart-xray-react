@@ -1,0 +1,31 @@
+.history-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-self: center;
+    background-color: aliceblue;
+    border: 1px solid black;
+    color: black;
+    margin-top: 10%;
+    padding: 2%;
+}
+
+.history {
+    display: flex;
+    align-self: center;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.flex-container > div {
+    margin: 5px;
+    /* padding: 10px; */
+}
+
+.time {
+    margin-bottom: 1%;
+}
